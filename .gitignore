@@ -1,0 +1,8 @@
+node_modules/
+results/
+*.log
+.env
+.env.*
+*.key
+*.pem
+*.sqlite

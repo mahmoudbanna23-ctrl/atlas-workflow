@@ -48,7 +48,7 @@ available here.
 
 ## Part 1 — the skills
 
-Copy `skills/atlas` and `skills/msn` into your Claude Code skills directory:
+Copy `skills/atlas`, `skills/msn` and `skills/fleet` into your Claude Code skills directory:
 
 - **Windows:** `C:\Users\<you>\.claude\skills\`
 - **Mac / Linux:** `~/.claude/skills/`
@@ -56,6 +56,60 @@ Copy `skills/atlas` and `skills/msn` into your Claude Code skills directory:
 **Check:** start a *fresh* Claude Code session and type `/atlas`. If nothing resolves, the skill
 registry did not see the folder — confirm the path has `skills/atlas/SKILL.md` in it, with the
 frontmatter block at the very top of the file, and that you really did start a new session.
+
+---
+
+## Part 1a — the agents, the fleet skill, and the drift hook
+
+Three pieces that make the "main chat is an orchestrator, not labour" model actually hold under a
+long session, none of them required to use `/atlas` at all.
+
+**The agents.** Copy `agents/` into your Claude Code agents directory:
+
+- **Windows:** `C:\Users\<you>\.claude\agents\`
+- **Mac / Linux:** `~/.claude/agents/`
+
+so you end up with `.../agents/scout.md`, `researcher.md`, `refuter.md`, `lean-drafter.md`, `debugger.md`. These
+are the Claude-side roles used when no outside seat can take the work, or when the fleet is down
+(see `skills/fleet/SKILL.md`). Each file's frontmatter pins its own model — cheapest that clears the
+job, not the model the main chat happens to be running.
+
+**Check:** start a fresh session, and ask the main chat to dispatch a trivial read-only search to
+the `scout` subagent. If it cannot find the agent, confirm the folder path and that model names in
+each file's frontmatter (`haiku` / `sonnet` / `opus`) match what your Claude Code build accepts.
+
+**The fleet skill.** `skills/fleet/SKILL.md` was copied in Part 1 along with the other two. It is
+the drift alarm: invoke `/fleet` when a chat has started doing the labour itself, and it re-routes
+in the same reply rather than writing a plan about re-routing.
+
+**The drift-guard hook.** `tools/guard/drift-guard.js` is a PostToolUse hook: it counts tool calls
+per session and injects a short reminder every 10 calls, plus a step-budget warning once a
+main-chat session passes roughly 80 steps (see README, "Cost is step count"). Wire it into your
+Claude Code `settings.json`:
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "*",
+        "hooks": [
+          { "type": "command", "command": "node /absolute/path/to/atlas/tools/guard/drift-guard.js" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Use an absolute path — hooks do not resolve relative to the repo. **Check:** run any tool ten times
+in a session (ten file reads is enough) and confirm a drift-check reminder appears; only sessions
+started *after* the settings edit will see it.
+
+**The cost report.** `tools/token-audit.js` reads the real `usage` fields Claude Code already wrote
+to your own transcripts — no setup beyond having used Claude Code at all. Run
+`node tools/token-audit.js --help` for usage, or `node tools/token-audit.js --agents` for a
+per-subagent growth table after a real session.
 
 ---
 

@@ -29,16 +29,31 @@ light and escalate if Frame turns up something genuinely unknown.
 - **Fable is the commander.** Fable frames, routes, judges and writes. Fable never does grunt work.
   If Fable's usage limit is hit, **Opus takes the commander role** (the user switches the chat
   model) — same rules, and the Stage 2 team talk becomes more important as the quality check.
-- **Subagents do the legwork: 1–2 at a time, hard cap 3.** Agents burn tokens too.
-- **Cheapest model that does the job well:** Haiku for mechanical sweeps (listing, extracting,
-  counting) · Sonnet for standard research and drafting · Opus only for synthesis a cheaper model
-  would botch · Fable never delegated to, it IS the commander.
+- **Main chat orchestrates; it does not labour.** It plans, writes briefs, spins up agents, reads
+  short reports, judges, integrates — never a bulk read, never opens a worker's raw output
+  directly (Stage 3). One-line fixes and a single grep stay inline; anything with steps goes down.
+- **Subagents do the legwork: 1–2 at a time, hard cap 3.** Agents burn tokens too. Roles, cheapest
+  model that clears each job — definitions ship in `agents/`:
+
+  | Role | Model | Job |
+  |---|---|---|
+  | Scout | Haiku | finds files/symbols/locations, reports locations — never dumps files |
+  | Researcher | Sonnet | reads docs/sources, reports facts, marks anything unverifiable as unverified |
+  | Builder | lean-drafter (Sonnet) | builds from a clear spec, runs its own checks |
+  | Refuter | Opus | reviews builder work, re-runs checks itself, never trusts a "done" claim |
+  | Debugger | Opus | hard root-cause work only |
+
+- **Every brief carries marching orders**: goal · exact files/URLs in scope · what it may change ·
+  what it must verify · what not to do · output format · output length cap · facts already known.
 - **Cost is step count, not starting context** (your workspace rules). A long-running agent costs its full
-  context on every remaining step. One bounded job, then return.
+  context on every remaining step. One bounded job, then return. **Session budget ~80 main-chat
+  steps**, then write a handoff and start a fresh session — `tools/guard/drift-guard.js` reminds you
+  at the threshold once wired as a PostToolUse hook (`SETUP.md`).
 - **Codex is the partner house, not a worker** (standing ruling). It is not on the lane
-  ladder and is never briefed as a seat. It holds one standing role: **the revision pass that
-  everything crosses before it reaches Claude** — Stage 4, step 4. Claude stays the final check, on
-  work that has already been fixed. The two houses are peers; neither audits itself.
+  ladder and is never briefed as a seat. Where it runs, it is an **optional extra pass for
+  high-stakes work** on top of Stage 4's two-layer default — never a substitute for the
+  independent refuter check that default requires. Claude stays the final check, on work that has
+  already been fixed. The two houses are peers; neither audits itself.
 
 ---
 
@@ -140,7 +155,7 @@ before any of it starts. Four decisions:
 | **Script** | Bulk repetitive per-item work — pages, files, rows | ⚠️ Per-item work belongs here, NOT in an agent loop. A script sends one item and forgets it; an agent drags every previous item along on every step. This is where the big token disasters came from. |
 | **Fleet** (MSN) | Reading, research, drafting, transcribing, formatting, first-draft code | Cheapest capable seat, and the ladder applies inside the fleet too. Only routes measured as working — see the MSN roster. |
 | **spec-kit** | Large, complex software builds only | **ASK the user before initializing it anywhere new** — it re-feeds artifacts and burns 20–50k a turn in the implement phase. Seed it in one project first, not everywhere. spec-kit plans; the free lane implements. |
-| **Claude** | Only when the finished, gated result is genuinely cheaper end to end | Briefing + waiting + checking + fixing + rewriting is the real price of delegating. Sometimes one direct pass wins. Say so when it does. |
+| **Claude** | Only when the finished, gated result is genuinely cheaper end to end | Briefing + waiting + checking + fixing + rewriting is the real price of delegating. A "direct pass" means one builder role (`agents/lean-drafter.md`), not the main chat — main chat stays inline only for a one-liner fix or a single grep. |
 
 **1a. Inside the Fleet lane, hand the seat choice to the gateway rather than naming a seat.** This is
 the layer that makes OmniRoute part of Route and not only of Do. The built-in combos — `auto`,
@@ -166,7 +181,9 @@ Haiku, Sonnet, Opus 5, Fable 5.1 on one side; every model the Codex CLI accepts 
 `gpt-5.6-terra` and `gpt-6-astra` among them, on the other. Rank the item's difficulty, then take the
 lowest model of *either* house that clears it — a mechanical sweep still goes to a Haiku or a mini
 model here, and only the item that must be right climbs to Fable or Astra. Do not pick by house, and
-do not pick by price — at this rung price has stopped being the variable.
+do not pick by price — at this rung price has stopped being the variable. **On the Claude side, route
+through the named roles** (scout / researcher / builder / refuter / debugger — `agents/*.md`), never
+into main chat directly; the roles are that side's own ladder, not a substitute for it.
 
 ⚠️ **Say out loud that this rung has been entered, and why.** Everything failing at once is a
 symptom, not a weather event; running the two most expensive houses silently for hours is exactly how
@@ -201,7 +218,9 @@ The lane runs. Two rules that hold in every lane:
   own sources; pasting content into a brief pays for it twice.
 - **Files out, verdicts in.** Work products land on disk. The commander's context holds the verdict
   line, not the transcription, not the draft, not the page image. An image read in the main
-  conversation is re-sent with every later request for the rest of the session.
+  conversation is re-sent with every later request for the rest of the session. **Main chat never
+  opens a worker's raw output** to check it directly — it reads only the worker's short report and
+  a failures list; large output stays on disk for the next agent to read.
 - **In the Fleet lane the gateway is the worker, and its fallback is the only measured step-count
   saver in this workflow.** Everything else here trims the size of a step; the combo pool retries a
   failed seat internally, so a failure costs no step at all on Claude's side. That is why Stage 2
@@ -228,41 +247,48 @@ Measured 2026-09-08: a vision model returned the longest, most fluent, best-form
 entire run — a transcription of a page that does not exist in the source file. Nothing in the text
 looked wrong. **Length is not evidence of quality.**
 
-So, in order:
+**Two layers are the default, every time:**
 
-1. **Machine checks first** — they reject broken work at zero model cost: missing or duplicated
-   items, sequence breaks (question numbers must run in order across pages), incomplete option sets,
-   empty output, absurd length, repeated passages. Cheap and honest. **But structural checks cannot
-   catch fabrication** — the invented page passed every one of them.
-2. **An independent second reader where one exists.** A different *kind* of tool, not a second model
-   from the same family — two models sharing a provider share a failure mode, and their agreement is
-   an alarm system, not a certificate.
-3. **A measured checker on a sample plus every failure.** It gets the item and its source, and
-   returns discrepancies or an explicit acceptance — not an essay. **One sample failure re-runs the
-   whole batch.**
-4. **The partner pass — Codex revises and fixes before anything reaches Claude** (standing ruling
-   2026-09-08). This is the last layer below the final check, and it is the one that *repairs* rather
-   than only reports: Codex returns corrected work plus a list of what it changed, so Claude reads a
-   fixed draft instead of a raw one. **Codex is treated as Claude's equal here, not as a worker** —
-   it is not on the Stage 2 lane ladder, it is never briefed as a seat, and its verdict is not
-   overridden simply because it came from the other house. Claude is the final check, not the first
-   reviser.
+1. **Machine/script checks first** — they reject broken work at zero model cost: missing or
+   duplicated items, sequence breaks (question numbers must run in order across pages), incomplete
+   option sets, empty output, absurd length, repeated passages. Cheap and honest. **But structural
+   checks cannot catch fabrication** — the invented page passed every one of them.
+2. **ONE independent checker — never the drafter.** Either an outside seat *measured* reliable on
+   this kind of check (see "Who may check" below) when one fills that slot, or the Opus **refuter**
+   subagent (`agents/refuter.md`) otherwise. It re-runs the checks itself against the brief and
+   reports pass/fail plus a defect list; it never trusts a "done" claim on its own say-so. One
+   failed sample re-runs the whole batch.
 
-   - **Difficulty picks the model, nothing else** — the same rule as rung 1b, and for the same reason:
-     at this step price is not the variable. Routine batches go to the routine Codex model
-     (`gpt-5.6-terra`); an item that must be right climbs to `gpt-6-astra`, whose house is measured
-     reliable at exactly this kind of check (2026-09-08: it called a printed answer key wrong,
-     refused a dose for an invented drug twice, and flagged an invented index term while confirming
-     the arithmetic around it separately).
-   - **Run it non-interactively, on files.** `codex exec -m <model>` with the paths, or `codex review`
-     for a code change — never a pasted body of material, same rule as every other brief. Codex CLI
-     0.153.2, verified on PATH 2026-09-08.
-   - ⚠️ **Codex never revises what Codex drafted.** If Stage 2 routed the drafting to a Codex model —
-     including through the last-resort rung — this step collapses into self-review and is skipped,
-     and the item goes to Claude with that fact stated. The "never its own work, and preferably not
-     its own house" rule below is not suspended by making the pass standing.
-   - ⚠️ **It is a paid pass on every batch, so the Stage 1 burn audit carries it as a line item.**
-     A standing gate that nobody prices is how a cost forecast silently doubles.
+That is the floor for every batch — nothing ships past it unchecked. **For high-stakes work**
+(material the user will be examined on, an irreversible action, anything where being wrong costs
+days), add whichever of these fits, on top of the two-layer floor, never instead of it:
+
+- **An independent second reader**, of a different *kind* of tool, not a second model from the same
+  family — two models sharing a provider share a failure mode, and their agreement is an alarm
+  system, not a certificate.
+- **A measured checker on a sample plus every failure**, beyond the one required in layer 2 — it
+  gets the item and its source, and returns discrepancies or an explicit acceptance, not an essay.
+- **The partner pass — Codex revises and fixes** (standing ruling 2026-09-08), when available. This
+  is the one extra layer that *repairs* rather than only reports: Codex returns corrected work plus
+  a list of what it changed, so the required layer-2 check reads a fixed draft instead of a raw one.
+  **Codex is treated as an equal here, not as a worker** — it is not on the Stage 2 lane ladder, it
+  is never briefed as a seat, and its verdict is not overridden simply because it came from the
+  other house. Layer 2 stays the final check, not the first reviser.
+
+  - **Difficulty picks the model, nothing else** — the same rule as rung 1b, and for the same reason:
+    at this step price is not the variable. Routine batches go to the routine Codex model
+    (`gpt-5.6-terra`); an item that must be right climbs to `gpt-6-astra`, whose house is measured
+    reliable at exactly this kind of check (2026-09-08: it called a printed answer key wrong,
+    refused a dose for an invented drug twice, and flagged an invented index term while confirming
+    the arithmetic around it separately).
+  - **Run it non-interactively, on files.** `codex exec -m <model>` with the paths, or `codex review`
+    for a code change — never a pasted body of material, same rule as every other brief. Codex CLI
+    0.153.2, verified on PATH 2026-09-08.
+  - ⚠️ **Codex never revises what Codex drafted.** If Stage 2 routed the drafting to a Codex model —
+    including through the last-resort rung — this pass collapses into self-review and is skipped,
+    and the item goes to the layer-2 checker with that fact stated.
+  - ⚠️ **It is a paid pass whenever it runs, so a Stage 1 burn audit that plans on it carries it as
+    a line item.** A gate nobody prices is how a cost forecast silently doubles.
 
 **Who may check — a standing ruling that replaced "verification never leaves Claude".** Medical
 content is no longer Claude's alone. Any seat that has been **measured reliable on that kind of
@@ -286,7 +312,7 @@ Where nothing measured exists for the job, the checker is Claude — the default
 That is the "run it against known answers and write the result down" step above, by machine and
 repeatable across seats. Its limit is that grading method: it qualifies a seat, and it cannot tell
 you a transcription is invented, which is the failure this stage exists for. It replaces none of the
-three steps. ⚠️ **No run route answered from outside** (`/run`, `/execute`, `/runs` all refused), so
+layers above, default or optional. ⚠️ **No run route answered from outside** (`/run`, `/execute`, `/runs` all refused), so
 running a suite is a dashboard action until proven otherwise — **never call a seat qualified on a
 suite that was written but not run.**
 

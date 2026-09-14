@@ -13,7 +13,11 @@ This repository holds the whole thing, so you can run it on your own fleet:
 |---|---|
 | `skills/atlas/` | **The workflow.** Five stages: Frame → Route → Do → Gate → Deliver. Install as a Claude Code skill, invoke with `/atlas`. |
 | `skills/msn/` | **The squad.** How a task gets handed to a specific model seat, briefed, and checked when it comes back. `/msn`. |
+| `skills/fleet/` | **The drift alarm.** Fires when the main chat starts doing the work itself; re-routes to the squad, or to the Claude roles below when the squad is down. `/fleet`. |
+| `agents/` | **The Claude-side roles.** Five narrow subagent definitions — scout, researcher, builder (`lean-drafter`), refuter, debugger — for when work has to stay inside Claude. |
 | `tools/omniroute/` | **The gateway probes.** Small node scripts that ask a local OmniRoute install what it can actually do, instead of trusting its dashboard. |
+| `tools/guard/drift-guard.js` | **The step-budget hook.** A PostToolUse hook that reminds you every 10 tool calls to re-check register and routing, and flags a ~80-step main-chat session for a fresh start. |
+| `tools/token-audit.js` | **The real cost report.** Reads the `usage` fields Claude Code actually wrote to your transcripts — measurement, not estimate — main chat vs subagents, biggest sessions, per-agent growth. |
 | `examples/departments.md` | **A worked example** — a real capability survey of one machine, written to the rules in `SETUP.md`. Read it to see what the output looks like before you make your own. |
 | `SETUP.md` | **Start here.** Install, API keys, OmniRoute, and how to verify each piece actually works. |
 | `LOCALISE.md` | Swapping the sender's seats for yours. Do this before you trust anything in `skills/msn/references/`. |
@@ -22,17 +26,21 @@ This repository holds the whole thing, so you can run it on your own fleet:
 
 ## The idea in one page
 
-**1. The default worker is not the main chat.** There is a ladder, and you take the lowest rung that
-can do the job:
+**1. The default worker is not the main chat — it is an orchestrator, not labour.** There is a
+ladder, and you take the lowest rung that can do the job:
 
-1. **A script**, if the work is per-item and repetitive. A hundred items is a loop, not a hundred
-   conversations.
-2. **A cheap outside seat** — whatever model CLIs and API keys you have. Reading, searching,
-   drafting, transcribing, formatting, first-draft code all leave.
-3. **A Claude subagent**, only when no outside seat can do it.
-4. **The main chat**, for reviewing, judging and routing — not for labour.
+1. **Inline in main chat** — only a one-liner fix or a single grep. Anything with steps goes down.
+2. **A cheap outside seat**, when the fleet is alive — whatever model CLIs and API keys you have
+   (`skills/msn/`). Reading, searching, drafting, transcribing, formatting, first-draft code all leave.
+3. **A Claude role**, when the fleet is down or can't do it — scout, researcher, builder, refuter,
+   debugger (`agents/`). A role hitting an ambiguous source escalates, never decides.
+4. **Main chat orchestrates** — plans, writes briefs, spins up agents, reads short reports, judges,
+   integrates. It never bulk-reads and never opens a worker's raw output directly.
 
-Say which rung you are on before you start. That one habit is most of the saving.
+Say which rung you are on before you start. That one habit is most of the saving. Every brief down
+the ladder carries marching orders: goal, files/URLs in scope, what it may change, what it must
+verify, what not to do, output format and length cap, facts already known. `/fleet` is the alarm for
+when a chat has drifted into doing the labour itself.
 
 **2. Cost is step count.** Every step re-sends the whole conversation, and the conversation grows as
 the work proceeds. A long-running agent costs its full context on *every remaining step*, so a lean
@@ -55,15 +63,17 @@ mark its own work. That holds for Claude too.
 git clone <this-repo> atlas
 ```
 
-Copy the two skill folders into your Claude Code skills directory:
+Copy the three skill folders into your Claude Code skills directory, and `agents/` into your
+Claude Code agents directory:
 
-- **Windows:** `C:\Users\<you>\.claude\skills\`
-- **Mac / Linux:** `~/.claude/skills/`
+- **Windows:** `C:\Users\<you>\.claude\skills\` and `C:\Users\<you>\.claude\agents\`
+- **Mac / Linux:** `~/.claude/skills/` and `~/.claude/agents/`
 
-so that you end up with `.../skills/atlas/SKILL.md` and `.../skills/msn/SKILL.md`.
+so that you end up with `.../skills/atlas/SKILL.md`, `.../skills/msn/SKILL.md`,
+`.../skills/fleet/SKILL.md`, and `.../agents/scout.md` (plus the other four role files) alongside it.
 
-Start a **fresh** Claude Code session — the skill registry loads at session start, so a running
-session will not see them. Then `/atlas` and `/msn` should resolve.
+Start a **fresh** Claude Code session — both registries load at session start, so a running
+session will not see them. Then `/atlas`, `/msn` and `/fleet` should resolve.
 
 **Then read `SETUP.md`.** The skills as shipped describe the sender's fleet; until you localise
 them they will confidently route work to seats you do not have.

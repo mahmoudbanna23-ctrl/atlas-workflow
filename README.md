@@ -15,7 +15,7 @@ This repository holds the whole thing, so you can run it on your own fleet:
 | `skills/msn/` | **The squad.** How a task gets handed to a specific model seat, briefed, and checked when it comes back. `/msn`. |
 | `skills/fleet/` | **The drift alarm.** Fires when the main chat starts doing the work itself; re-routes down the ladder — coding CLI through a gateway first, then the fleet, then the Claude roles below when all are out. `/fleet`. |
 | `agents/` | **The Claude-side roles.** Five narrow subagent definitions — scout, researcher, builder (`lean-drafter`), refuter, debugger — for when work has to stay inside Claude. |
-| `tools/omniroute/` | **The gateway probes.** Small node scripts that ask a local OmniRoute install what it can actually do, instead of trusting its dashboard. |
+| `tools/omniroute/` | **The gateway probes.** Small node scripts that ask a local OmniRoute install what it can actually do, instead of trusting its dashboard. Plus `codex-gw.sh`, which runs `codex exec` through the gateway with tool calls working. |
 | `tools/guard/drift-guard.js` | **The step-budget hook.** A PostToolUse hook that reminds you every 10 tool calls to re-check register and routing, and flags a ~80-step main-chat session for a fresh start. |
 | `tools/token-audit.js` | **The real cost report.** Reads the `usage` fields Claude Code actually wrote to your transcripts — measurement, not estimate — main chat vs subagents, biggest sessions, per-agent growth. |
 | `examples/departments.md` | **A worked example** — a real capability survey of one machine, written to the rules in `SETUP.md`. Read it to see what the output looks like before you make your own. |
@@ -32,7 +32,7 @@ ladder, and you take the lowest rung that can do the job:
 1. **Inline in main chat** — only a one-liner fix or a single grep. Anything with steps goes down.
 2. **Default worker — a coding CLI through the local gateway** (`skills/fleet/`, `skills/msn/`): use
    `auto/coding`, or `auto/coding:reliable` for must-be-right work; brief file, background run,
-   short report back.
+   short report back. Codex goes through `tools/omniroute/codex-gw.sh`, which makes tool calls work.
 3. **That CLI out, gateway alive** — a second coding CLI through the gateway, using the same combo.
 4. **Gateway down, a CLI still alive** — the coding CLI on its own login: a routine model for
    routine work, a stronger model for must-be-right work.

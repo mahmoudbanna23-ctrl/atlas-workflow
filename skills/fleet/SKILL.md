@@ -27,6 +27,8 @@ one rung; do not retry in a loop, and never trust a quota tool.
 
 2. **Default worker — a coding CLI through the local gateway:** `auto/coding`, or
    `auto/coding:reliable` for must-be-right work; brief file, background run, short report back.
+   For Codex, run it through `tools/omniroute/codex-gw.sh` — without its flags Codex's extra tool
+   types make the gateway return no tool calls, and the run edits nothing.
 
 3. **CLI out, gateway alive:** a second coding CLI through the gateway, using the same combo and
    the dispatch loop in §6.

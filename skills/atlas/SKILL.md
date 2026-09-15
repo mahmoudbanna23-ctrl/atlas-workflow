@@ -154,7 +154,7 @@ this order:
 | Lane | Use it for | Warning |
 |---|---|---|
 | **Inline main chat** | One-liner fixes or a single grep only | Anything with steps goes down. |
-| **Coding CLI through the local gateway** (default worker) | Real drafting/build work | Use `auto/coding`, or `auto/coding:reliable` for must-be-right work. |
+| **Coding CLI through the local gateway** (default worker) | Real drafting/build work | Use `auto/coding`, or `auto/coding:reliable` for must-be-right work. Codex runs through `tools/omniroute/codex-gw.sh`. |
 | **Second coding CLI through the gateway** | The default CLI is out but the gateway is alive | Use the same combo. |
 | **Coding CLI on its own login** | The gateway is down but a CLI is alive | A routine model for routine work; a stronger model for must-be-right work. |
 | **Fleet** (MSN) | Both CLI routes are out | Rest of the fleet direct, no gateway; every output is checked. |

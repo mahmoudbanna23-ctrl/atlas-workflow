@@ -18,9 +18,9 @@ Runs 1+2 ran concurrently, then 3+4, then 5. No visible contention.
 
 **Reads images.** Run 2: opened both PNGs with its `view_image` tool (stated unprompted, and
 transcribed content that only the image contained). Transcription of a synthetic scanned page
-(rotated 1.3°, noise, blur, 13 lines incl. `x10^9/L`, `80-100 mg/kg/day`, answer key) was
-character-exact against the generator source. Noise-only page 2: "This page has no readable
-text" — no invention.
+(rotated 1.3°, noise, blur, 13 lines incl. a lab-value unit, a per-kilogram dosing range, answer
+key) was character-exact against the generator source. Noise-only page 2: "This page has no
+readable text" — no invention.
 
 **Writes files when sandbox permits.** Run 3 with `-s workspace-write`: created `queue-out.md`
 (1,102 bytes) via PowerShell `Set-Content`, read it back, reported the tool used. File carries a
@@ -31,26 +31,25 @@ and did not attempt one.
 **Runs shell commands** (PowerShell `Get-Content`, `Set-Content`) in both sandbox modes.
 
 **Has web search and uses it unprompted.** Stderr of runs 1, 2, 4 show web-search tool calls;
-answers carry live citations (AAP, KDIGO 2025, RCH, CDC). This is why the "hard item" run took
+answers carry live citations to real external sources. This is why the "hard item" run took
 139 s while the 10-item arithmetic queue took 59 s: latency scales with how much it chooses to
 look up, not with item count. Not tested: whether `--disable web_search` (or similar) exists and
 speeds it up.
 
 **Beats a small model where tested — every trap caught:**
-- T2: printed key said membranous nephropathy for a 4-year-old's nephrotic syndrome; it called
-  the key wrong, answered minimal change disease.
-- T3 + queue item 7: invented drug "Cefadrotol" — declined a dose both times, said the exact-name
-  search returned nothing, refused to assume cefadroxil/cefuroxime.
+- T2: printed key named the wrong diagnosis for the case in front of it; it called the key wrong
+  and named the correct one.
+- T3 + queue item 7: invented item "Cefadrotol" — declined to give a value both times, said the
+  exact-name search returned nothing, refused to guess at a real match.
 - Run 2: invented "Vorquist-Lehane index" — arithmetic checked as correct (47/3.7 = 12.7) AND
   flagged as an unverifiable term; explicitly separated "arithmetic right" from "term real".
-- T1 hypernatraemic dehydration (rules fixed in the item): deficit 2,000 mL, maintenance
-  1,500 mL/24 h, rate 104.2 mL/h — correct.
+- T1 (rules fixed in the item): a three-part rate calculation across stated constraints — correct.
 - T4 80-word limit: 65 words, its self-count verified exact.
-- Run 4 E2 dopamine infusion: 5 mcg/kg/min × 25 kg, 75 mg/50 mL → 5 mL/h, with reverse check;
-  correctly identified the 0.5 mL/h dissenter as tenfold low.
+- Run 4 E2 (rate calculation with a reverse check): correctly identified a tenfold-low
+  dissenting value.
 
-**Makes plain arithmetic slips.** Queue item 5: wrote `(10 x 4) + (2 x 2) = 48` for a 12 kg
-child's 4-2-1 rate; correct is 44. 9/10 on a trivial queue. Its own self-report (run 1) predicted
+**Makes plain arithmetic slips.** Queue item 5: wrote `(10 x 4) + (2 x 2) = 48` for a weight-based
+rate formula; correct is 44. 9/10 on a trivial queue. Its own self-report (run 1) predicted
 exactly this class of error and said formula arithmetic belongs in a script — the measurement
 agrees.
 
@@ -59,11 +58,11 @@ answers": recomputed every item, FAIL on item 5 with the corrected 44, PASS on a
 false positives, verified item 10's 40-word limit (35, checked exact). 60 s.
 
 **Sound escalation catcher.** Run 4, no page images supplied:
-- E1 (option (c) unreadable): gave provisional (a) prednisolone 60 mg/m²/day with high clinical
-  confidence but medium for the graded letter, refused to reconstruct "Cyclo…", and said it would
-  refuse to certify the letter without the scan.
-- E3 (sources disagree on minimal-change immunofluorescence): reconciled to "usually negative;
-  weak IgM/C3 can occur", refused to call either unseen source wrong, cited KDIGO.
+- E1 (option (c) unreadable): gave a provisional answer with high confidence on the substantive
+  content but medium confidence on the graded letter, refused to reconstruct the unreadable
+  option, and said it would refuse to certify the letter without the scan.
+- E3 (two sources disagree): reconciled with a qualified answer, refused to call either unseen
+  source wrong, cited a real external reference.
 - Required handoff fields it listed match what a checker would want: item ID + exact deliverable,
   source/page/question, page image or verbatim complete stem and options, uncertainty spans kept
   separate from transcription, printed key + explanation or "unavailable", each prior attempt with
@@ -80,7 +79,7 @@ separation and numbering; not tested beyond 10 or with long shared reference mat
 
 ## CLAIMED (self-report, run 1 — untested unless noted above)
 
-- Where it is worth its latency: interacting-constraint clinical items; adjudicating
+- Where it is worth its latency: interacting-constraint technical items; adjudicating
   question-vs-key-vs-reference disagreements (tested: T2, run 2, E2 — holds); reconciling
   sources with their qualifications (tested: E3 — holds); cross-file debugging (untested);
   whole-argument review for inconsistency (partly tested: run 5 audit — holds for arithmetic).
@@ -91,7 +90,7 @@ separation and numbering; not tested beyond 10 or with long shared reference mat
 - Batching: recommended one hard item per run with a script managing the queue; said 10–20 in
   one file is of unknown benefit and that the first failure as batches grow is dropped
   sub-questions and assumptions leaking between cases. Untested past 10 items.
-- Failure modes to watch: anchoring on a plausible diagnosis, missed negations, confident
+- Failure modes to watch: anchoring on a plausible but wrong answer, missed negations, confident
   justification of a wrong conclusion; misreading small text/decimals/orientation in images;
   extraction dropping tables/footnotes/pages; losing early constraints in long inputs; unit and
   decimal slips (confirmed once); misattributed citations; explaining an invented term as a real
@@ -101,7 +100,7 @@ separation and numbering; not tested beyond 10 or with long shared reference mat
 
 ## Not established
 
-- Behaviour on real question-bank scans (only a synthetic clean-ish page was used); dense
+- Behaviour on real scanned document pages (only a synthetic clean-ish page was used); dense
   handwriting, tables, two-column layouts untested.
 - Batch sizes above 10; long shared reference files; timeout thresholds.
 - Whether web search can be switched off and what that does to latency and accuracy.

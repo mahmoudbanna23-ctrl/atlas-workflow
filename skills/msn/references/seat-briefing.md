@@ -17,7 +17,7 @@ stranger seeing the problem cold. Read it, then answer the brief that follows.
 - Be concrete and specific to the system described. No generic best-practice filler.
 - Ground every recommendation in something the operator can verify **from disk**.
 - You are given only NON-PRIVATE context, on purpose. Never ask for source material, and never
-  for medical / scanned / copyrighted content — it stays with the local seat and will not be sent.
+  for sensitive / scanned / copyrighted content — it stays with the local seat and will not be sent.
 
 ## Who is in the room
 Manager (Claude) — routes, verifies, writes the minutes. Codex — the local insider seat that can

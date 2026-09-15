@@ -28,7 +28,7 @@ it is more token-frugal than convening everyone for every item.
    - vendor-independent judgement, worth ~83k tokens → **Fable 5.1** (bounded subagent).
    - adversarial attack on a plan → **ChatGPT** (paste-back).
 
-   The three API seats take the **user's own non-private material only** — never a scanned, medical
+   The three API seats take the **user's own non-private material only** — never a scanned, sensitive
    or copyrighted page, never anyone else's data. Those stay with Codex.
 3. **Manager writes the brief, seat plays it, manager verifies from disk, you land it.** That closes
    most items without a meeting. Dispatch mechanics: [dispatch-and-verify.md](dispatch-and-verify.md).
@@ -103,8 +103,8 @@ the rest under **Split** with the reason it lost, and move on.
 ## Mode 3 — the team talk (build a plan, and pick the team)
 
 **When:** a project large enough that the plan itself is the hard part, and the routing of the work
-across seats is a real decision rather than an obvious one. This is the mode `sama` Phase 6 calls
-instead of the old ChatGPT-only debate ritual — the squad argues the plan into shape *and* proposes
+across seats is a real decision rather than an obvious one. This is the mode `/atlas`'s Route stage
+calls instead of the old ChatGPT-only debate ritual — the squad argues the plan into shape *and* proposes
 who plays where, rather than one outside mind attacking a finished document.
 
 **Honest mechanic, stated so nobody builds on a fiction: there is no shared channel and no live group
@@ -120,7 +120,7 @@ argument has silently collapsed. See the availability warning in [roster.md](ros
 
 ### Stage 1 — the agenda (one brief, reused by every seat)
 
-**Self-contained** — zero workspace context needed to answer it, same gate `sama` uses. It carries the
+**Self-contained** — zero workspace context needed to answer it, the same gate your planning skill uses. It carries the
 problem, the constraints, the house rules, and this explicit three-part ask:
 
 1. Propose the plan.
@@ -130,7 +130,7 @@ problem, the constraints, the house rules, and this explicit three-part ask:
 Part 3 is the one that makes the team sheet honest; a seat is the cheapest source of truth about its
 own ceiling.
 
-**Data rule, unchanged and absolute:** nothing private, medical, copyrighted, scanned or personal goes
+**Data rule, unchanged and absolute:** nothing private, sensitive, copyrighted, scanned or personal goes
 into this brief. Genericise the problem until it can be attacked by a stranger. If the real problem
 cannot survive genericising, it is not a team-talk item.
 
@@ -182,7 +182,7 @@ it in stage 1; the manager builds the real one after verifying against [roster.m
 
 Rules that bind the sheet:
 
-- **Anything touching a scanned, medical or copyrighted page is Codex, locally, always.** No exception
+- **Anything touching a scanned, sensitive or copyrighted page is Codex, locally, always.** No exception
   a seat proposes survives this.
 - **Verification is never on the sheet.** It is the manager's, in every row.
 - **Every row needs a fallback**, because stage 0 already proved seats vanish.
@@ -211,11 +211,11 @@ router can close the item with one seat, the team talk is the wrong tool.**
 ## The rules that bind every mode
 
 - **The manager never delegates the verification or the human gate.** A seat's output is data; it is
-  re-checked from disk before it counts (medical content: read against the page image).
+  re-checked from disk before it counts (sensitive content: read against the page image).
 - **One bounded job per seat, then it returns** — cost is step count. Never leave a seat running.
 - **Nothing private leaves the machine** — vision on private material stays with Codex; the off-machine
   seats (Gemini, Groq, OpenRouter, and the free lane) take the **user's own non-private text only**,
-  never a scanned/medical/copyrighted page, never anyone else's data, never a secret.
+  never a scanned/sensitive/copyrighted page, never anyone else's data, never a secret.
 - **Keep the meeting cheap.** The full board and the team talk are the exceptions. If the router can
   close an item with one seat, that is the right answer — convening five models to rename a variable is
   the token trap MSN exists to avoid.

@@ -3,7 +3,7 @@
 //
 // Sends the SAME synthetic test to every allowlisted OmniRoute seat, scores what can be scored by
 // machine, and writes a markdown report. Carries no project content: every test below is invented
-// for this file, so nothing copyrighted, medical or personal reaches any seat.
+// for this file, so nothing copyrighted, sensitive or personal reaches any seat.
 //
 // Usage (gateway must be running — Desktop\start-omniroute.bat, window stays open):
 //   node "C:/Users/<you>/.claude/skills/msn/scripts/interview.mjs"
@@ -74,9 +74,9 @@ const CANDIDATES = [
 // a plausible flag is the failure that costs a main-chat step to catch, so it scores as a fail.
 
 const PATHS = [
-  'tools/bank-harness/pagecov-ep2.js',
-  'progress/WORKFLOW-who-does-what.md',
-  'content/peds/qb-pages/index.json',
+  'tools/harness/check.js',
+  'docs/workflow.md',
+  'content/pages/index.json',
 ];
 
 const SEEDED_ROWS = [
@@ -98,14 +98,14 @@ const TESTS = {
       'Write a short handoff note, 80-120 words, telling another worker to run a coverage check.\n' +
       'It must name these three paths EXACTLY as written, each once:\n' +
       PATHS.map((p) => `  ${p}`).join('\n') +
-      '\nThe check is run with: node tools/bank-harness/pagecov-ep2.js\n' +
+      '\nThe check is run with: node tools/harness/check.js\n' +
       'That command takes NO flags. Do not invent options, flags or extra files.\n' +
       'Output the note only. No preamble.',
     score(text) {
       const notes = [];
       for (const p of PATHS) if (!text.includes(p)) notes.push(`missing path ${p}`);
       // Any flag-looking token after the script name is an invention.
-      const invented = text.match(/pagecov-ep2\.js\s+(--?[a-z][\w-]*)/i);
+      const invented = text.match(/check\.js\s+(--?[a-z][\w-]*)/i);
       if (invented) notes.push(`invented flag ${invented[1]}`);
       const words = text.trim().split(/\s+/).length;
       if (words < 56 || words > 156) notes.push(`length ${words} words, outside 80-120 +/-30%`);

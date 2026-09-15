@@ -21,7 +21,7 @@
 // echo, and reports what ACTUALLY applied. A mode that silently does nothing shows up as
 // "echo: (none)" with 0% saving rather than as a result.
 //
-// The payload is invented for this file: no project content, no medical content, no keys.
+// The payload is invented for this file: no project content, no sensitive content, no keys.
 
 import { execFileSync } from 'node:child_process';
 import { writeFileSync, mkdirSync } from 'node:fs';

@@ -9,11 +9,11 @@ A candidate is signed only when **all three gates** clear:
 1. **You fund / sign in.** New keys and accounts are your labour, and installs/keys go through a
    user-run Desktop `.bat` that writes a report Claude reads — never the shell's own view (sandbox gotcha).
 2. **The ToS is read for training-on-inputs**, per candidate, before any project material touches it.
-   Medical/copyrighted/scanned content never goes to a tier that trains, ever.
+   Sensitive/copyrighted/scanned content never goes to a tier that trains, ever.
 3. **The freeze is lifted** (or the user waives it, as they did for these four on 2026-09-03).
 
 Even a signed API seat takes **the user's own non-private material only** — the off-machine rule on
-scanned/medical/copyrighted content is absolute, and vision on those pages stays with **Codex**.
+scanned/sensitive/copyrighted content is absolute, and vision on those pages stays with **Codex**.
 
 ---
 
@@ -34,24 +34,24 @@ text-only as of 2026).
 | Candidate | Would fill | Note |
 | --- | --- | --- |
 | **OpenRouter** | swappable vision seat + router backend | One key routes 20+ free models incl. free vision; ~50 req/day (≈1,000 after a one-time $10 top-up). **Privacy depends on the routed model** — check per model, do not assume safe. Free vision model IDs from the sweep are approximate — confirm on the live free-models page. |
-| **Gemini (AI Studio)** | strongest free vision | **SIGNED 2026-09-03 — now a full seat, see [roster.md](roster.md).** Trains on inputs, so **non-private material only**: never a scanned/medical/copyrighted page (those stay with Codex). |
+| **Gemini (AI Studio)** | strongest free vision | **SIGNED 2026-09-03 — now a full seat, see [roster.md](roster.md).** Trains on inputs, so **non-private material only**: never a scanned/sensitive/copyrighted page (those stay with Codex). |
 
-**Codex remains the vision seat.** It is local, so it is the only one that can read a scanned medical
+**Codex remains the vision seat.** It is local, so it is the only one that can read a scanned sensitive
 page without breaking the off-machine rule. A bench vision seat is only ever for **non-private** images.
 
 ---
 
 ## Caveats (all from the sweep, all unverified without a live check)
 
-- **Egypt availability — CLOSED 2026-09-05.** This caveat was written during
+- **Geographic availability — CLOSED 2026-09-05.** This caveat was written during
   the research sweep, before any key existed, and it is no longer true. Re-tested from the user's own
-  machine with the egress country recorded this time: **country `EG`, no VPN, and HTTP 200 from all
+  machine with the egress country recorded this time: **no VPN, and HTTP 200 from all
   four seats then signed** — Gemini (connect 69 ms), Groq (48 ms), Cerebras (63 ms), OpenRouter
   (62 ms). Latency that low rules out geo-routing detours as well as hard blocks. The caveat still
   stands for anything **unsigned**. **Inference tested too, same day** — real completions, not just
   auth: **Gemini 200 (on `gemini-3.6-flash`), Groq 200, OpenRouter 200** — the three surviving seats,
   question fully closed. Cerebras failed for a reason that is **not geographic** — an exhausted
-  budget — and was released the same day. **No seat is geo-restricted from Egypt.**
+  budget — and was released the same day. **No seat is geo-restricted for this user.**
 - **⚠️ The lesson this check paid for: auth is not availability.** Both failures it found passed the
   2026-09-03 auth check and would have passed it again. `/models` answered 200 for Cerebras while
   every completion returned 402, and Gemini's listing still advertises models it refuses to run.
@@ -96,8 +96,8 @@ the **axis** (quality/speed/cost/capability/reliability), and **the measurement 
    GitHub Models are on this page with reasons. A challenger that re-proposes one must say what changed
    — a new ToS, a new tier, a new price — or it is closed unread.
 
-**When the log is actually read:** at the next `/sama` run (its Phase 3 sweep is the real evaluation),
-or when the owner asks for a bench review. Never on a schedule, never mid-flight, never during a freeze.
+**When the log is actually read:** at the next `/atlas` run, or when the owner asks for a bench
+review. Never on a schedule, never mid-flight, never during a freeze.
 
 | Date | Candidate | Beats | Axis | Claim | Settled by | Status |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -144,9 +144,9 @@ Any future bench must read both fields, or it will report thinking models as sil
 owns them yet:
 
 - **SambaNova** — benched pending a read of the raw ToS, not marketing pages. Still unread.
-- **Egypt availability** — **CLOSED** (2026-09-05: country `EG` confirmed, HTTP 200 from every seat
-  tried, sub-70 ms connects, real completions from all three survivors; see the caveats section).
-  Open only for unsigned candidates.
+- **Geographic availability** — **CLOSED** (2026-09-05: confirmed from the signing location, HTTP 200
+  from every seat tried, sub-70 ms connects, real completions from all three survivors; see the
+  caveats section). Open only for unsigned candidates.
 - **Groq vision** — catalog was in flux; unverified since the sweep.
 - **The deep-reasoning slot Cerebras used to hold is now empty.** Releasing it on 2026-09-05 left the
   squad with no cheap, fast, strong-reasoning text seat: Groq covers speed, Gemini and Fable cover

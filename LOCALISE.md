@@ -50,8 +50,8 @@ text has not thereby returned *correct* text. Check the output against the image
 
 ## C. The data rule — write your own line
 
-The shipped rule is the sender's: his own study material may go to any seat, because it is his and
-he accepts the risk; a third party's uncleared material, secrets and personal identifiers never
+The shipped rule is the sender's: their own material may go to any seat, because it is theirs
+and they accept the risk; a third party's uncleared material, secrets and personal identifiers never
 leave, ever; and browser-session seats are never used because losing an account is the one
 unacceptable outcome.
 

@@ -15,7 +15,7 @@ marked MANUAL, which needs a human read of the transcript below.
 | Cline MiniMax M3 | `cl/minimax/minimax-m3` | ERR 401 | 13 | [cline] All 1 connection(s) credits exhausted — please reconnect in the dashboard |
 | Cline Grok 4.5 | `cl/x-ai/grok-4.5` | ERR 401 | 16 | [cline] All 1 connection(s) credits exhausted — please reconnect in the dashboard |
 | Cline Kimi K3 | `cl/moonshotai/kimi-k3` | ERR 402 | 336 | [cline/moonshotai/kimi-k3] [402]: Insufficient balance. Your Cline Credits balance is $-0.39 (reset after 2m) |
-| Gemini flash-latest | `gemini/gemini-flash-latest` | fail | 7478 | missing path tools/bank-harness/pagecov-ep2.js; missing path progress/WORKFLOW-who-does-what.md; missing path content/pe |
+| Gemini flash-latest | `gemini/gemini-flash-latest` | fail | 7478 | missing path tools/harness/check.js; missing path docs/workflow.md; missing path content/pa |
 | Zen big-pickle | `opencode-zen/big-pickle` | ERR 504 | 32280 | [504]: Request exceeded OmniRoute's local rate-limit execution expiration (legacy resilienceSettings.requestQueue.maxWai |
 
 **Depth chart A:** groq/groq/compound-mini → cl/google/gemma-4-31b-it:free
@@ -82,9 +82,9 @@ Hi [Name],
 
 Please run the coverage check for the latest release. Execute the script with the exact command:
 
-node tools/bank-harness/pagecov-ep2.js
+node tools/harness/check.js
 
-The script will read the index file at content/peds/qb-pages/index.json and compare against the expectations documented in progress/WORKFLOW-who-does-what.md. Verify that the output shows 100% coverage for all listed pages; if any gaps appear, update the corresponding JSON entries before merging. Let me know once the check passes or if you encounter errors.
+The script will read the index file at content/pages/index.json and compare against the expectations documented in docs/workflow.md. Verify that the output shows 100% coverage for all listed pages; if any gaps appear, update the corresponding JSON entries before merging. Let me know once the check passes or if you encounter errors.
 
 After the check succeeds, commit any changes to the repository and inform QA that the coverage baseline is up to date.
 
@@ -94,7 +94,7 @@ Thanks!
 ### A · Cline Gemma 4-31b
 
 ```
-Hi, could you please run a coverage check on the current build? You can execute the check by running the command: node tools/bank-harness/pagecov-ep2.js. Please ensure you do not add any flags to the command. For a detailed overview of the process and responsibilities, refer to progress/WORKFLOW-who-does-what.md. Once the check is complete, verify that the results align with the page mappings listed in content/peds/qb-pages/index.json. Let me know if you run into any issues or if the output shows any gaps in coverage. Thanks for your help with this!
+Hi, could you please run a coverage check on the current build? You can execute the check by running the command: node tools/harness/check.js. Please ensure you do not add any flags to the command. For a detailed overview of the process and responsibilities, refer to docs/workflow.md. Once the check is complete, verify that the results align with the page mappings listed in content/pages/index.json. Let me know if you run into any issues or if the output shows any gaps in coverage. Thanks for your help with this!
 ```
 
 ### A · Cline Kimi K3
@@ -142,7 +142,7 @@ Hi, could you please run a coverage check on the current build? You can execute 
 ### A · Gemini flash-latest
 
 ```
-Hi Alex, please take over the coverage verification step for our shift handoff. First, review your assigned tasks in progress/WORKFLOW-who
+Hi Alex, please take over the coverage verification step for our shift handoff. First, review your assigned tasks in docs/workflow
 ```
 
 ### B · Groq compound-mini

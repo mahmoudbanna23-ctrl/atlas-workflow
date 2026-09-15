@@ -19,9 +19,9 @@ shared context. Everything the task needs goes in:
 
 **Prepend [seat-briefing.md](seat-briefing.md) verbatim** for every non-local seat — it catches the
 seat up on how the board works and what binds it, so it answers as a member and not as a stranger.
-If, and only if, the item is about how the example project is *organised*, append
-[context-herophilus.md](context-herophilus.md) too; it is process and economics only, and no medical
-content may be added to it. Then the brief itself:
+If, and only if, the item is about how the example project is *organised*, append that project's own
+context file too, if one exists; it is process and economics only, and no private content may be
+added to it. Then the brief itself:
 
 - **Goal** — one task per brief.
 - **Current state** — where the files are, what already exists.
@@ -31,7 +31,7 @@ content may be added to it. Then the brief itself:
 - **Report contract** — what to write to disk and where.
 - **Tell the seat it will NOT commit** — you will.
 
-**Data gate before you send:** no secrets, no personal data, and **no scanned/medical/copyrighted page
+**Data gate before you send:** no secrets, no personal data, and **no scanned/sensitive/copyrighted page
 to any off-machine seat**. Vision → Codex only. Prose on private text → not vibe (Mistral trains).
 
 ## 2. Dispatch
@@ -55,8 +55,8 @@ Per seat — exact commands and auth in [roster.md](roster.md):
   reads its own key from the env var and run it as `node <script>.mjs` — an inline shell command
   naming the key variable is refused by the credential guard. Read `reasoning` as well as `content`,
   and send `max_tokens` on OpenRouter. Full wire format and the live model ids: [roster.md](roster.md).
-  Gemini is a **full seat** (drafting, research, debate), not paste-back — the user waived his own
-  privacy for it; the scanned/medical/copyrighted ban still binds.
+  Gemini is a **full seat** (drafting, research, debate), not paste-back — the user waived their own
+  privacy for it; the scanned/sensitive/copyrighted ban still binds.
 - **ChatGPT** → no API here: hand the self-contained brief to the user to paste, and read the answer back.
 
 Background it and let it return; **a run is done when its output file exists and the process has
@@ -69,7 +69,7 @@ The seat's own "done / passed" is a claim. Re-verify:
 - **Re-run the real gates yourself** (the validator / boot-check / build from step 1). Never on faith.
 - **Read the diff or the output against the brief** — did the seat do what was asked, nothing more
   (scope creep), nothing less?
-- **Medical / scanned content:** the human reads the key, dose, unit, exponent **against the page
+- **Sensitive / scanned content:** the human reads the key, dose, unit, exponent **against the page
   image**. This is the one check that never compares a reading with itself, and it is never delegated.
 - For removals grep for dangling refs; for schema/migration changes round-trip them.
 

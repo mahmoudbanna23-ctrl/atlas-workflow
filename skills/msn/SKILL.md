@@ -6,7 +6,7 @@ description: >-
   agenda, routes each item to the seat best at it, verifies, and writes the result; it does not
   do the grunt work. The squad does the legwork — the free-lane fleet (opencode/agy/vibe/grok),
   Codex (a local-process vision seat, OpenAI model), the API seats (Gemini/Groq/OpenRouter), and
-  paste-back minds (ChatGPT). His own study material may go to any of them (owner ruling 2026-09-08). Use when the user says
+  paste-back minds (ChatGPT). The user's own material may go to any of them (a configurable default). Use when the user says
   "convene the board/squad", "run it past the fleet",
   "get MSN on this", invokes /msn, wants several models on a problem, or wants work pushed to the
   cheapest capable seat to spare Claude's tokens. The fleet is the DEFAULT worker, not the fallback:
@@ -54,15 +54,15 @@ Full roster with the exact invocation and data rule for each seat is
 | Seat | Position | Best at | Hard limit |
 | --- | --- | --- | --- |
 | **Claude** | Manager | Agenda · routing · **verification** · the final write | Never delegates the verify or a human gate |
-| **Codex** | The specialist | The **local** vision seat — reads scanned pages; bounded local execution. No longer the only one: `gemini/gemini-3.1-flash-lite` was measured reading a real question-bank page on 2026-09-08 and is faster. `cxa/` through the gateway is NOT this seat and has no transport configured. | **Process is local, model is OpenAI’s** — pages ARE uploaded; **owner ruled this channel trusted 2026-09-05**, and 2026-09-08 cleared his material for every seat |
+| **Codex** | The specialist | The **local** vision seat — reads scanned pages; bounded local execution. No longer the only one: `gemini/gemini-3.1-flash-lite` was measured reading a real scanned document page on 2026-09-08 and is faster. `cxa/` through the gateway is NOT this seat and has no transport configured. | **Process is local, model is OpenAI’s** — pages ARE uploaded; **this channel is trusted by default**, and by default the user's material is cleared for every seat |
 | **Astra** (`gpt-6-astra`) | Deep-lying playmaker | Hardest reasoning on the Codex channel — long chains, tricky proofs, plans that must hold up | **Same channel, same vendor, same data rule as Codex** — not an independent seat; slower and dearer than the default, so ask for it, don't default to it |
 | **opencode** (Zen) | Attacker | Coding, tooling, scripts (has a proven relay) | No secrets/personal data in the brief |
-| **agy** (Starter) | Attacker | Coding, general legwork; works from Egypt | same |
+| **agy** (Starter) | Attacker | Coding, general legwork; verified working on a constrained regional connection | same |
 | **vibe** (Mistral) | Attacker | Drafting, prose, transcription | same; Mistral free trains on inputs — non-private content only |
 | **grok** (free X) | Attacker | Quick reasoning, critique, second opinions | same |
 | **ChatGPT** | Opposition scout | Adversarial debate / red-team (paste-back) | Self-contained brief; you paste |
-| **Gemini** (API) | Creative playmaker | Strong reasoning, drafting, research, debate, **image gen** (Nano Banana) | Trains on inputs — the owner accepts that for his own material, scans included (ruling 2026-09-08) |
-| **Groq** (API) | Fast midfielder | Very fast reasoning, critique, router-proposer | No copyrighted/medical/scanned page off-machine, ever |
+| **Gemini** (API) | Creative playmaker | Strong reasoning, drafting, research, debate, **image gen** (Nano Banana) | Trains on inputs — by default that's accepted for the user's own material, scans included |
+| **Groq** (API) | Fast midfielder | Very fast reasoning, critique, router-proposer | No copyrighted/sensitive/scanned page off-machine, ever |
 | **OpenRouter** (API) | Utility sub | Many swappable models on one key (some vision) | Privacy depends on routed model → **non-private only** |
 | **OmniRoute** (local gateway) | Utility — **LIVE 2026-09-07, 6 seats wired** | ONE endpoint over every seat the owner holds, failing over between them instead of dying with one. Fastest verified: `groq/groq/compound-mini` 640 ms · `cl/google/gemma-4-31b-it:free` 886 ms. **Cline is the deep bench — 7 free models incl. Kimi K3, Grok 4.5, GLM 5.2, DeepSeek V4** | ⚠️ **Seats we sign into, only.** Never `dva`/`cxa`/`aug`/`zc` — other vendors' paid CLIs on credentials we don't hold; never `auto/*` or `*/openrouter/free` unread (auto-routers, one run returned a safety classifier). `oc` is CLEARED (its paid ids ask for our key). OpenRouter stays OUT of combos — answers nothing at $0 credit and takes 25–40 s to fail. Circuit breaker is on by default; do NOT retune it, its keys are per provider TYPE and would fuse Groq/Gemini too. Roster has every measurement |
 | **Fable 5.1** | In-house second mind | Independent reasoning — the one non-OpenAI seat besides Gemini | Bounded subagent, ~83k tokens a job — diversity seat, never a savings seat |
@@ -71,7 +71,7 @@ Full roster with the exact invocation and data rule for each seat is
 
 ## The ladder — MSN is rungs 1 and 2
 
-Workspace `CLAUDE.md` §9 ("Routing ladder — who does the work") is the authority; this is what it
+Your own routing rules (e.g. in your `CLAUDE.md`) are the authority; this is what it
 means for the squad. **Take the lowest rung that can do the job, and say which rung before starting.**
 
 1. **Fleet first.** Anything that can leave Anthropic, leaves — reading, searching, research,
@@ -82,14 +82,14 @@ means for the squad. **Take the lowest rung that can do the job, and say which r
    reasoning genuinely needs it, never because it is the strongest name on the sheet. ⚠️ **Free
    does not mean available** — see the measured free-lane state in
    [references/roster.md](references/roster.md) before assuming four lanes are live.
-3. **Claude subagent — only when no seat can do it.** Since the owner's 2026-09-08 ruling that is
-   mostly **verification**, plus vision work no wired seat can take. `haiku` for read-only search,
+3. **Claude subagent — only when no seat can do it.** By default that is mostly **verification**,
+   plus vision work no wired seat can take. `haiku` for read-only search,
    `sonnet` for drafting and transcription.
    A helper hitting an ambiguous source **escalates, never decides**.
 4. **The manager reviews and routes; it does not play.** It reads what came back, judges it, names
    the fix, and sends it back down. Its own hands only on critical items — **and it asks first.**
-5. **Opus doing the work itself — critical only, and ask.** Standing exceptions: Horus's security
-   core, Architecture-Support's executing subagent.
+5. **Opus doing the work itself — critical only, and ask.** Standing exceptions are named per
+   project — e.g. a security-critical core in one project, an executing subagent in another.
 
 ⚠️ **A dead seat means the NEXT seat, not Claude.** A 429, a quota wall, a 402, a timeout — that is
 one seat out, not the fleet out. Go down the bench and try the next capable seat, and only climb to
@@ -98,7 +98,7 @@ the most expensive move available, and it is the one that happens by reflex. Say
 and how, in the report — an undocumented fallback looks identical to laziness.
 
 **Never leaves Claude:** verification of any seat's output · edits to `CLAUDE.md`, `MEMORY.md`,
-`settings.json` · git. **Study material is no longer on this list** — owner's ruling 2026-09-08.
+`settings.json` · git. **The user's own material is no longer on this list, by default.**
 
 ## The playmaker — route before you convene
 
@@ -118,7 +118,7 @@ Convening the whole squad for every item is the token trap. **Default to the rou
 
 4. **Convene the team talk when there is no plan yet** — the squad argues a plan into shape *and*
    proposes who plays where, across every aspect of the project, ending in a **team sheet** (work item
-   → seat → data rule → fallback). This is what `sama` Phase 6 now calls instead of the old
+   → seat → data rule → fallback). This is what `/atlas`'s Route stage can call instead of a
    ChatGPT-only debate. Rarest and most expensive of the three; hard cap of three rounds.
 
 The routing logic, all three meeting flows (proposer → aggregator, the optional debate round, the team
@@ -131,17 +131,17 @@ format are in [references/running-a-board-meeting.md](references/running-a-board
    truth; re-verify from disk before it counts. **A claim that can be tested is tested before it is
    written down** — on 2026-09-05 three seats unanimously asserted a print pipeline needed a polyfill
    and would be slow; the test took minutes and refuted all three at once. **Unanimity is not
-   evidence.** On medical content, a wrong transcription is a wrong
+   evidence.** On content that must be exactly right, a wrong transcription is a wrong
    answer — the human read against the page image is irreducible.
-2. **His material may go to any seat; other people's may not.** Owner's ruling 2026-09-08: everything
-   he supplies is cleared with its owner and counts as his own — scans, question banks, medical
-   content, publisher-copyrighted pages included — and he accepts the risk to cut the token burn.
-   Codex is no longer the only vision route; it is just the local one. Still barred: **a third
-   party's uncleared data**, and **keys, secrets or personal identifiers in any brief**. His one
-   stated redline is **account-ban exposure** — never drive a consumer web UI through his own cookies.
+2. **The user's own material may go to any seat; other people's may not.** By default, everything
+   the user supplies is cleared with its owner and counts as their own — scans, reference documents,
+   publisher-copyrighted pages included — and they accept the risk to cut the token burn. Codex is no longer the only vision route; it is just the local one. Still barred: **a
+   third party's uncleared data**, and **keys, secrets or personal identifiers in any brief**. The
+   user's one stated redline is **account-ban exposure** — never drive a consumer web UI through
+   their own cookies.
 3. **One bounded job per seat, then it returns.** Cost is step count, not starting context — a seat
    left running long costs its whole context every step. Split long work across fresh dispatches.
-4. **You install, sign in, upload. Git is the manager's** (owner ruling 2026-09-07, replacing "you
+4. **You install, sign in, upload. Git is the manager's** (the default here, replacing "you
    commit"): the manager commits and pushes, directly or through a cheap subagent, and reports what
    went where. Handing a push to a subagent does not launder it — a subagent pushing is the manager
    pushing, so the care is the same: `git commit -F <msgfile> -- <explicit paths>`, never `git add -A`
@@ -157,7 +157,7 @@ format are in [references/running-a-board-meeting.md](references/running-a-board
    plausibly beat the incumbent on **quality, speed, cost, capability or reliability** — including when
    no seat fit the item at all. A challenger entry is **a claim to test, never a verdict**: it names the
    candidate, the incumbent, the axis, and the measurement that would settle it. **Nothing is wired in
-   the session that logged it**, the log is read at the next `/sama` run or on your request, and a
+   the session that logged it**, the log is read at the next `/atlas` run or on your request, and a
    documented rejection is not re-opened without new evidence.
 6. **Surface, don't absorb.** Report a seat's design decisions, unasked-for turns, and nitpicks
    rather than silently keeping them. Stop for scope changes — don't expand a brief yourself.
@@ -178,15 +178,13 @@ its relay; agy/vibe/grok direct; Codex read-only with images), the `result.json`
 review checklist are in [references/dispatch-and-verify.md](references/dispatch-and-verify.md).
 The commit boundary is fixed: **the party that verified the work commits — and that is you.**
 
-## Relationship to /sama
+## Relationship to /atlas
 
-`sama` plans a project; **MSN is how the seats do the work inside that plan** — and, since
-2026-09-05, how the plan itself gets argued out: **sama Phase 6 runs the MSN team talk** (Mode 3)
-rather than a ChatGPT-only paste-back debate. ChatGPT stays a seat in that meeting, not the whole
-gate. Where sama's older text
-said "delegation lanes" or "free-lane CLIs (OpenCode/agy/vibe/grok)", it now means the MSN squad.
-sama still owns the plan and the burn audit; **its Phase 6 gate is now an MSN team talk**, and MSN owns execution and the
-in-flight council. Do not run MSN to *plan* a new project — that is sama's job.
+`/atlas` plans a project; **MSN is how the seats do the work inside that plan** — and its Route
+stage can call the MSN team talk (Mode 3) instead of a ChatGPT-only paste-back debate. ChatGPT
+stays a seat in that meeting, not the whole gate. `/atlas` still owns the plan and the burn audit;
+MSN owns execution and the in-flight council. Do not run MSN to *plan* a new project — that is
+`/atlas`'s job.
 
 ## References
 
@@ -201,9 +199,9 @@ in-flight council. Do not run MSN to *plan* a new project — that is sama's job
 - [references/seat-briefing.md](references/seat-briefing.md) — **paste this above the brief** for any
   non-local seat: it tells the seat how the board works and what binds it, so it answers as a member
   rather than a stranger. Used at stage 1 of dispatch-and-verify.
-- [references/context-herophilus.md](references/context-herophilus.md) — the non-private process/
-  economics pack for the example project. Add it to a brief **only** when the item is about how that project
-  is organised. It carries no medical content and none may be added to it.
+- A project's own non-private process/economics pack (if it keeps one), added to a brief **only**
+  when the item is about how that project is organised. It carries no private content and none may
+  be added to it.
 - [references/omniroute-dashboard-map.md](references/omniroute-dashboard-map.md) — the full page-by-
   page map of the local OmniRoute gateway (all 101 dashboard routes, the 15 compression engines, the
   six connected seats and their measured health), surveyed 2026-09-08. Read it instead of browsing

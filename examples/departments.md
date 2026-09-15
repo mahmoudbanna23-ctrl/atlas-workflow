@@ -1,8 +1,8 @@
 # The departments — what the workspace turned out to be able to do
 
-**Built on discovery, not on need** (owner ruling, 2026-09-08): *"don't decide the departments on
-what we need now, decide on what you'll find, we don't know what we might need in the future and
-always leave the department list open for more in case we discovered some new things later."*
+**Built on discovery, not on need.** The default here: don't decide the department list by what's
+needed right now — decide by what's actually found, since future needs are unknown, and always
+leave the list open for more to be discovered later.
 
 So this is not a plan. Every department below is a capability that was **measured working at least
 once**, or a real capability sitting behind a named, specific blocker. Some of them have no job in
@@ -10,7 +10,7 @@ any current project. That is deliberate — the point is to know what the buildi
 deciding what to do in it.
 
 **This list is open and expected to grow.** It replaces the A/B/C/D chart in
-`factory-departments.md`, which was drawn from what the the example project sprint needed in September.
+`factory-departments.md`, which was drawn from what the example project sprint needed in September.
 
 ## How a department gets on this list
 
@@ -60,9 +60,9 @@ Nothing is admitted for being useful. Nothing is refused for being useless today
 **Measured.** WPS reads the scans locally at $0 (settled 2026-09-01,
 `<project>\progress\ocr-pipeline.md`) — this is the cheap route, and the bottleneck was never
 here. Astra (`gpt-6-astra`) read two PNGs on 2026-09-08 and transcribed a synthetic scanned page —
-rotated 1.3°, noisy, blurred, 13 lines including `x10^9/L` and `80-100 mg/kg/day` —
-**character-exact against the source**; on a noise-only page it said "this page has no readable
-text" rather than inventing one.
+rotated 1.3°, noisy, blurred, 13 lines including a lab-value unit and a per-kilogram dosing
+range — **character-exact against the source**; on a noise-only page it said "this page has no
+readable text" rather than inventing one.
 
 **Who staffs it.** WPS locally first, $0. Astra where the page is hard or the reading has to be
 right. Through the OmniRoute gateway only Gemini reads an image at all.
@@ -88,11 +88,11 @@ department with one seat is a single point of failure, and that is the honest st
 **What it can do.** Take an item and its source, return the discrepancies or an explicit
 acceptance. Not an essay.
 
-**Who may staff it — owner ruling 2026-09-08.** Verification is no longer Claude's alone. Any seat
+**Who may staff it.** Verification is no longer Claude's alone by default. Any seat
 **measured reliable on that kind of check** may do it. Astra qualifies, measured: it called a
-printed answer key wrong (the key said membranous nephropathy for a 4-year-old's nephrotic
-syndrome; it answered minimal change disease), refused twice to give a dose for an invented drug,
-and flagged an invented index term while separately confirming that the arithmetic around it was
+printed answer key wrong (the key named the wrong diagnosis for the case; it named the correct
+one), refused twice to give a dosage for an invented substance, and flagged an invented index
+term while separately confirming that the arithmetic around it was
 right. Handed a file of answers to audit, it recomputed all ten, failed the one that was wrong,
 passed the rest with no false positives, in 60 s.
 
@@ -156,7 +156,7 @@ Top models by volume this session: `big-pickle` 70, `gpt-oss-120b` 60, `compound
 
 **What it can do.** Live web search through the gateway. **Measured 2026-09-08:**
 `omniroute_web_search` answered on `duckduckgo-free` — **no key, no cost** — and the first result
-for a paediatric nephrology query was the KDIGO 2025 guideline PDF.
+for a specialist domain query was the correct reference guideline PDF.
 
 **What it cannot do yet.** `omniroute_web_fetch` (fetch and extract a page) returns *"No
 credentials configured for any web-fetch provider"* — it wants a key for Firecrawl, Jina Reader,
@@ -204,8 +204,8 @@ Claude paying to read each file. Live limits, read off the tool itself: 5,000 fi
 **The blocker is one setting.** `local_corpus_status` reports `configured: false`. A root has to be
 set under **Settings > Context Sources** in the OmniRoute dashboard. That is a click.
 
-**Why this one matters more than its size suggests.** Point it at the extracted lecture text and
-the cached transcripts, and every seat in the fleet can search the study material directly instead
+**Why this one matters more than its size suggests.** Point it at your own extracted documents and
+the cached transcripts, and every seat in the fleet can search your own material directly instead
 of having text pasted into its brief.
 
 ## 12. The Cartographers — routing 🟠
@@ -308,9 +308,9 @@ answers `{"batches":[]}`. Live, empty, never carried a single request. `cli-batc
 monitor, upload files, retrieve results.
 
 The reason to care is arithmetic: batch lanes are typically **half the price** of live calls, paid
-for in latency. The workspace's biggest unpriced job is 1,637 pages of scanned books through the
-one seat that can read them. That is the shape a batch lane is for — no deadline inside the hour,
-enormous volume.
+for in latency. The workspace's biggest unpriced job is a very large batch of scanned documents
+through the one seat that can read them. That is the shape a batch lane is for — no deadline
+inside the hour, enormous volume.
 
 Unmeasured: whether OmniRoute's batch path reaches Gemini at all, or only the OpenAI-shaped
 providers. Nothing is claimed until it is submitted.

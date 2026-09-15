@@ -15,8 +15,10 @@ Companion file: `compression-measured.md` (the compression claim, measured the s
   HTTP 400 `Model '<x>' is not available in the active live catalog` when actually called. Do not
   route from `/api/models`.
 - Prefix counts from `/v1/models`: `openrouter` 1039, `aihorde` 161, `dva` 125, `opencode-zen` 108,
-  `no-think` 70, `gemini` 43, `auto` 38, `aug` 28, `kc`/`kilocode` 26 each, `cxa` 26, `tllm` 26,
-  `cfp` 20, `groq` 18, `cl`/`cline` 17, `zc` 13, `oc` 8, `ddgw` 6, `felo` 5, plus a few singletons.
+  `no-think` 70, `gemini` 43, `auto` 38, `aug` 28, `kc`/`kilocode` 26 each, `cxa` 26,
+  `groq` 18, `cl`/`cline` 17, `zc` 13, `oc` 8, `felo` 5, the gateway's browser-session pools (seats
+  that drive a consumer web UI with your cookies) — blocked, account-ban risk — 52 combined across
+  three prefixes, plus a few singletons.
 
 ## The `auto/*` virtual routes — the one genuinely new capability
 
@@ -110,11 +112,12 @@ render their shell and nav only — there is no server data behind them on this 
 ## Cautions
 
 - **Unvetted relay prefixes.** Of the 1,828 ids, roughly 450 sit behind aggregators of unknown
-  provenance: `aihorde`, `dva`, `no-think`, `aug`, `cxa`, `tllm`, `cfp`, `zc`, `oc`, `ddgw`,
-  `felo`. `auto/best-free` selected one of them (`big-pickle`) unprompted. Treat any `auto/*free*`
-  route as sending the prompt to a third party nobody here has vetted.
+  provenance: `aihorde`, `dva`, `no-think`, `aug`, `cxa`, `zc`, `oc`, `felo`, and the gateway's
+  browser-session pools (seats that drive a consumer web UI with your cookies) — blocked,
+  account-ban risk. `auto/best-free` selected `oc/big-pickle` unprompted. Treat any
+  `auto/*free*` route as sending the prompt to a third party nobody here has vetted.
 - **The vision seats in this catalogue do not reopen scanned material.** The workspace rule bans
-  scanned, medical and copyrighted pages from leaving Claude because of who receives them, not
+  scanned, sensitive and copyrighted pages from leaving Claude because of who receives them, not
   because no remote model can see them. Local Codex remains the only vision seat for those.
 - **`GET /api/providers` returns an `apiKey` field.** Never print it, never write it into any file
   under `<workspace>`, never into a brief.
@@ -151,7 +154,7 @@ The areas that returned 404 on the first pass exist under different names: `/api
 ## Reading images — MEASURED 2026-09-08, and this is the one that matters
 
 A synthetic 900×300 PNG was rendered locally (`System.Drawing`, no source material touched) carrying
-three lines: a clinical sign list, a weight-based dose, and a citation with a planted error token.
+three lines: a domain-specific data list, a weight-based value, and a citation with a planted error token.
 Sent as an ordinary chat message with an `image_url` part:
 
 | Route | Seat it chose | Latency | Transcription |
@@ -161,13 +164,13 @@ Sent as an ordinary chat message with an `image_url` part:
 | `auto/best-vision` | `gemini/gemini-3.7-flash` | 5390 ms | exact |
 | `auto/pro-vision` | `gemini/gemini-3.7-flash` | 4512 ms | exact |
 
-All four returned every word byte-perfect — the dose `0.6 mg/kg IV, max 16 mg`, the citation
+All four returned every word byte-perfect — the value `0.6 units/kg, max 16 units`, the citation
 `p.142`, and the planted token `ERR_TEST_4419`. **There is a working off-machine vision seat.**
 
 Two caveats. Every route chose Gemini, so this rides entirely on the Gemini key — it is one seat, not
-four. And the standing workspace rule still sends scanned pages to Codex only; the owner's
-2026-09-08 permission ruling would change that, but `CLAUDE.md` and `MEMORY.md` have not been
-updated and until they are, the rule binds.
+four. And the standing workspace rule still sends scanned pages to Codex only; a later permission
+default would change that, but your `CLAUDE.md` and `MEMORY.md` need to be updated for it to take
+effect, and until they are, the rule binds.
 
 `/v1/ocr` itself is **not usable**: it is hardwired to Mistral (`No credentials for provider:
 mistral`). The working shape, for the record, is

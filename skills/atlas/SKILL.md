@@ -71,10 +71,10 @@ or automating an account? A doomed branch dies HERE, before research spends a to
 declined auto-sniper). Name what was cut and offer the compliant version.
 
 **The data rule as it now stands (a standing ruling that replaced an older off-machine ban):** the
-user's own material — scans, medical content, question banks included — may go to any seat, because
-everything he supplies is cleared with its owner and counts as his own. What still never leaves:
-a third party's uncleared data, secrets, personal identifiers. And **never a browser-session seat**
-(`cfp/`, `ddgw/`, `tllm/`) — an account ban is the one redline.
+user's own material — scans, coursework, reference documents included — may go to any seat, because
+everything the user supplies is cleared with its owner and counts as their own. What still never
+leaves: a third party's uncleared data, secrets, personal identifiers. And **never a seat that drives
+a consumer web UI through your own browser cookies** — an account ban is the one redline.
 
 **Then, scaled to the job:**
 
@@ -260,7 +260,7 @@ looked wrong. **Length is not evidence of quality.**
    failed sample re-runs the whole batch.
 
 That is the floor for every batch — nothing ships past it unchecked. **For high-stakes work**
-(material the user will be examined on, an irreversible action, anything where being wrong costs
+(work that must be exactly right, an irreversible action, anything where being wrong costs
 days), add whichever of these fits, on top of the two-layer floor, never instead of it:
 
 - **An independent second reader**, of a different *kind* of tool, not a second model from the same
@@ -290,8 +290,8 @@ days), add whichever of these fits, on top of the two-layer floor, never instead
   - ⚠️ **It is a paid pass whenever it runs, so a Stage 1 burn audit that plans on it carries it as
     a line item.** A gate nobody prices is how a cost forecast silently doubles.
 
-**Who may check — a standing ruling that replaced "verification never leaves Claude".** Medical
-content is no longer Claude's alone. Any seat that has been **measured reliable on that kind of
+**Who may check — a standing ruling that replaced "verification never leaves Claude".** This kind
+of check is no longer Claude's alone. Any seat that has been **measured reliable on that kind of
 check** may do it: Astra and its house qualify (measured 2026-09-08 — it called a printed answer key
 wrong, refused a dose for an invented drug twice, and flagged an invented index term while confirming
 its arithmetic separately), and there may be others among the gateway's ids that nobody has tested
@@ -321,8 +321,8 @@ same ruling as Stage 1, repeated here because this is where a skipped scan gets 
 
 **Say exactly what was checked.** If a sample was checked, the corpus is not verified — it is
 sampled, and the delivery says so. Name whether the partner pass ran, which Codex model took it, and
-what it changed — a fix nobody records is indistinguishable from a fix nobody made. For material the user will be examined on, every unit actually
-promoted into the study set gets compared against its source: stem, all options, answer key,
+what it changed — a fix nobody records is indistinguishable from a fix nobody made. For work that
+must be exactly right, every unit actually promoted gets compared against its source: stem, all options, answer key,
 and any explanation being relied upon. Pay attention to negations, numbers, units and inequalities —
 but do not check only those.
 

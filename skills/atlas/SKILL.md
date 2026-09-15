@@ -49,11 +49,11 @@ light and escalate if Frame turns up something genuinely unknown.
   context on every remaining step. One bounded job, then return. **Session budget ~80 main-chat
   steps**, then write a handoff and start a fresh session — `tools/guard/drift-guard.js` reminds you
   at the threshold once wired as a PostToolUse hook (`SETUP.md`).
-- **Codex is the partner house, not a worker** (standing ruling). It is not on the lane
-  ladder and is never briefed as a seat. Where it runs, it is an **optional extra pass for
-  high-stakes work** on top of Stage 4's two-layer default — never a substitute for the
-  independent refuter check that default requires. Claude stays the final check, on work that has
-  already been fixed. The two houses are peers; neither audits itself.
+- **The default worker is a coding agent CLI through a gateway** (updated ruling) — it now sits
+  first on the lane ladder (Stage 2 §1), ahead of the fleet and Claude roles: a gateway combo first,
+  a second CLI through the same gateway if it alone is out, the CLI's own vendor login if the
+  gateway is down. Stage 4's independent check is still never that same CLI reviewing its own
+  draft — see the self-review rule there.
 
 ---
 
@@ -148,16 +148,27 @@ a consumer web UI through your own browser cookies** — an account ban is the o
 **Nothing below this stage decides whether it is needed.** Route names the machinery, out loud,
 before any of it starts. Four decisions:
 
-**1. Which lane does the work?** Take the lowest that can do the job (your workspace rules):
+**1. Which lane does the work?** Take the lowest that can do the job (your workspace rules), in
+this order:
 
 | Lane | Use it for | Warning |
 |---|---|---|
-| **Script** | Bulk repetitive per-item work — pages, files, rows | ⚠️ Per-item work belongs here, NOT in an agent loop. A script sends one item and forgets it; an agent drags every previous item along on every step. This is where the big token disasters came from. |
-| **Fleet** (MSN) | Reading, research, drafting, transcribing, formatting, first-draft code | Cheapest capable seat, and the ladder applies inside the fleet too. Only routes measured as working — see the MSN roster. |
-| **spec-kit** | Large, complex software builds only | **ASK the user before initializing it anywhere new** — it re-feeds artifacts and burns 20–50k a turn in the implement phase. Seed it in one project first, not everywhere. spec-kit plans; the free lane implements. |
-| **Claude** | Only when the finished, gated result is genuinely cheaper end to end | Briefing + waiting + checking + fixing + rewriting is the real price of delegating. A "direct pass" means one builder role (`agents/lean-drafter.md`), not the main chat — main chat stays inline only for a one-liner fix or a single grep. |
+| **Inline main chat** | One-liner fixes or a single grep only | Anything with steps goes down. |
+| **Coding CLI through the local gateway** (default worker) | Real drafting/build work | Use `auto/coding`, or `auto/coding:reliable` for must-be-right work. |
+| **Second coding CLI through the gateway** | The default CLI is out but the gateway is alive | Use the same combo. |
+| **Coding CLI on its own login** | The gateway is down but a CLI is alive | A routine model for routine work; a stronger model for must-be-right work. |
+| **Fleet** (MSN) | Both CLI routes are out | Rest of the fleet direct, no gateway; every output is checked. |
+| **Claude roles** | Fleet all out | Scout (Haiku), researcher (Sonnet), builder (Sonnet), refuter (Opus), debugger (Opus, rare). |
+| **Claude window low** | The Claude window is low | Stop, write a handoff, and resume after the reset. |
 
-**1a. Inside the Fleet lane, hand the seat choice to the gateway rather than naming a seat.** This is
+⚠️ **Bulk per-item work goes in a script, never an agent loop** — a script sends one item and forgets it; an agent re-sends every previous item on every step.
+
+Main chat orchestrates throughout; it is not a rung. For large, complex software builds, **ask the
+user before initializing spec-kit anywhere new** — it re-feeds artifacts and burns 20–50k a turn in
+the implement phase. Seed it in one project first, not everywhere; spec-kit plans, the default
+worker implements.
+
+**1a. In the gateway coding-CLI rungs, hand the seat choice to the gateway rather than naming a seat.** This is
 the layer that makes OmniRoute part of Route and not only of Do. The built-in combos — `auto`,
 `auto/coding`, `auto/reasoning`, `auto/vision`, `auto/coding:reliable` — are **model ids**, each an
 eight-seat pool with strategy `fallback`, so a seat that fails is retried **inside the gateway**
@@ -173,15 +184,20 @@ to fetch — pull it when the per-seat numbers are the decision, never to check 
 **`omniroute_check_quota` LIES** — 100% and "valid" for every connection including the ones that are
 out of credit. Never route off it.
 
-**1b. The last resort — when every lane is gone** (standing ruling). If the gateway is down,
-the fleet is dead and no script can do it, the roster collapses to two houses: ChatGPT and Claude.
-There is no cost ladder left to climb, so **difficulty alone decides who takes it — across every model
-of both houses, not just the four brothers.** Both houses field a full ladder and all of it is in play:
-Haiku, Sonnet, Opus 5, Fable 5.1 on one side; every model the Codex CLI accepts on this account,
-`gpt-5.6-terra` and `gpt-6-astra` among them, on the other. Rank the item's difficulty, then take the
-lowest model of *either* house that clears it — a mechanical sweep still goes to a Haiku or a mini
-model here, and only the item that must be right climbs to Fable or Astra. Do not pick by house, and
-do not pick by price — at this rung price has stopped being the variable. **On the Claude side, route
+Probe liveness once with one tiny request per rung before a batch. On a limit or connection error,
+drop one rung; do not retry in a loop, and never trust a quota tool.
+
+**1b. The last resort — only after the gateway is down and every later rung is gone** (standing
+ruling). If the gateway is down, the fleet is dead, and the coding CLI's own vendor login (§1, rung
+4) is also exhausted, the roster collapses to two houses: the coding CLI's vendor and Claude. The
+coding CLI's vendor counts only through a login or model it still has quota on. There is no cost
+ladder left to climb, so **difficulty alone decides who takes it — across every model of both
+houses, not just a named handful.** Both houses field a full ladder and all of it is in play: Haiku,
+Sonnet, Opus 5, Fable 5.1 on one side; every model the coding CLI's own account accepts, routine and
+must-be-right tiers alike, on the other. Rank the item's difficulty, then take the lowest model of
+*either* house that clears it — a mechanical sweep still goes to a Haiku or a mini model here, and
+only the item that must be right climbs to the top of either house. Do not pick by house, and do not
+pick by price — at this rung price has stopped being the variable. **On the Claude side, route
 through the named roles** (scout / researcher / builder / refuter / debugger — `agents/*.md`), never
 into main chat directly; the roles are that side's own ladder, not a substitute for it.
 
@@ -268,41 +284,36 @@ days), add whichever of these fits, on top of the two-layer floor, never instead
   system, not a certificate.
 - **A measured checker on a sample plus every failure**, beyond the one required in layer 2 — it
   gets the item and its source, and returns discrepancies or an explicit acceptance, not an essay.
-- **The partner pass — Codex revises and fixes** (standing ruling 2026-09-08), when available. This
-  is the one extra layer that *repairs* rather than only reports: Codex returns corrected work plus
-  a list of what it changed, so the required layer-2 check reads a fixed draft instead of a raw one.
-  **Codex is treated as an equal here, not as a worker** — it is not on the Stage 2 lane ladder, it
-  is never briefed as a seat, and its verdict is not overridden simply because it came from the
-  other house. Layer 2 stays the final check, not the first reviser.
+- **The partner pass — the coding CLI revises and fixes**, when available and it did not draft the
+  item itself. This is the one extra layer that *repairs* rather than only reports: it returns
+  corrected work plus a list of what it changed, so the required layer-2 check reads a fixed draft
+  instead of a raw one. Its verdict is not overridden simply because it came from the other house.
+  Layer 2 stays the final check, not the first reviser.
 
-  - **Difficulty picks the model, nothing else** — the same rule as rung 1b, and for the same reason:
-    at this step price is not the variable. Routine batches go to the routine Codex model
-    (`gpt-5.6-terra`); an item that must be right climbs to `gpt-6-astra`, whose house is measured
-    reliable at exactly this kind of check (2026-09-08: it called a printed answer key wrong,
-    refused a dose for an invented drug twice, and flagged an invented index term while confirming
-    the arithmetic around it separately).
-  - **Run it non-interactively, on files.** `codex exec -m <model>` with the paths, or `codex review`
-    for a code change — never a pasted body of material, same rule as every other brief. Codex CLI
-    0.153.2, verified on PATH 2026-09-08.
-  - ⚠️ **Codex never revises what Codex drafted.** If Stage 2 routed the drafting to a Codex model —
-    including through the last-resort rung — this pass collapses into self-review and is skipped,
-    and the item goes to the layer-2 checker with that fact stated.
+  - **Difficulty picks the model, nothing else** — the same rule as rung 1b, and for the same
+    reason: at this step price is not the variable. Routine batches go to the CLI's routine model;
+    an item that must be right climbs to its strongest model, when that house is measured reliable
+    at exactly this kind of check (record what it caught and missed before relying on it).
+  - **Run it non-interactively, on files** — `codex exec -m <model>` with the paths, or `codex
+    review` for a code change — never a pasted body of material, same rule as every other brief.
+  - ⚠️ **The coding CLI never revises what it drafted itself.** Since it is now Stage 2's default
+    worker (§1), this pass collapses into self-review and is skipped far more often than not — the
+    item then goes straight to the layer-2 checker with that fact stated.
   - ⚠️ **It is a paid pass whenever it runs, so a Stage 1 burn audit that plans on it carries it as
     a line item.** A gate nobody prices is how a cost forecast silently doubles.
 
 **Who may check — a standing ruling that replaced "verification never leaves Claude".** This kind
 of check is no longer Claude's alone. Any seat that has been **measured reliable on that kind of
-check** may do it: Astra and its house qualify (measured 2026-09-08 — it called a printed answer key
-wrong, refused a dose for an invented drug twice, and flagged an invented index term while confirming
-its arithmetic separately), and there may be others among the gateway's ids that nobody has tested
-yet. Two conditions survive the ruling, because they are what "reliable" means:
+check** may do it — record the measurement (what it caught, what it missed) before trusting a
+seat with this job; there may be several among the gateway's ids that nobody has tested yet. Two conditions survive the ruling, because they are what "reliable" means:
 
 - **Measured, not assumed.** A seat earns the checking job by being run against known-answer material
   first, with the result written down. Reputation and model size are not evidence. The one seat that
   produced the most confident, best-formatted output of an entire run was transcribing a page that
   does not exist.
-- **Never its own work, and preferably not its own house.** A model checking itself is not a check.
-  Two models from one vendor share blind spots — count the second at a discount (`roster.md`).
+- **Never its own work or, for an outside provider, its own house; a Claude builder's work goes to a
+  separate refuter run.** A model checking itself is not a check. Two models from one vendor share
+  blind spots — count the second at a discount (`roster.md`).
 
 Where nothing measured exists for the job, the checker is Claude — the default, no longer the rule.
 

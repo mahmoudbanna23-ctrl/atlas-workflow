@@ -70,7 +70,7 @@ long session, none of them required to use `/atlas` at all.
 - **Mac / Linux:** `~/.claude/agents/`
 
 so you end up with `.../agents/scout.md`, `researcher.md`, `refuter.md`, `lean-drafter.md`, `debugger.md`. These
-are the Claude-side roles used when no outside seat can take the work, or when the fleet is down
+are the Claude-side roles used only when every outside rung (gateway, both CLIs, fleet) is out
 (see `skills/fleet/SKILL.md`). Each file's frontmatter pins its own model — cheapest that clears the
 job, not the model the main chat happens to be running.
 

@@ -1,6 +1,6 @@
 ---
 name: fleet
-description: Stop doing the work in the main chat and re-route it — to the fleet (MSN), or to Claude roles when the fleet is down. Use when the user invokes /fleet, or says the chat has forgotten the rules, is burning tokens, is doing the work itself, should delegate, or should use the fleet/squad/seats. With an argument (e.g. "/fleet the transcription"), re-route only that piece.
+description: Stop doing the work in the main chat and re-route it down the ladder — coding CLI through a gateway first, then the fleet, then Claude roles when all are out. Use when the user invokes /fleet, or says the chat has forgotten the rules, is burning tokens, is doing the work itself, should delegate, or should use the fleet/squad/seats. With an argument (e.g. "/fleet the transcription"), re-route only that piece.
 ---
 
 # Fleet — you drifted. Re-route.
@@ -20,14 +20,25 @@ rung, say so and why — with the reason, not a defence.
 
 ## 2. Check the fleet, then pick a rung
 
-Free lanes and any local gateway can run out of quota. Probe liveness before routing; if a seat is
-dead, treat the fleet as down for this task — do not retry it in a loop.
+Probe liveness with one tiny request per rung before a batch. On a limit or connection error, drop
+one rung; do not retry in a loop, and never trust a quota tool.
 
-**Fleet alive:** lowest rung that can do the job — dispatch through `/msn` (`skills/msn/SKILL.md`),
-cheapest capable seat first, a Claude subagent only when no seat can do it. Pick a seat by roster
-entry, never by matching text in a model id.
+1. **Inline in main chat:** only a one-liner fix or a single grep.
 
-**Fleet down:** re-route to Claude roles, never to main chat itself:
+2. **Default worker — a coding CLI through the local gateway:** `auto/coding`, or
+   `auto/coding:reliable` for must-be-right work; brief file, background run, short report back.
+
+3. **CLI out, gateway alive:** a second coding CLI through the gateway, using the same combo and
+   the dispatch loop in §6.
+
+4. **Gateway down, CLI alive:** the coding CLI on its own login — a routine model for routine work,
+   a stronger model for must-be-right work.
+
+5. **Both out:** the rest of the fleet direct, no gateway — dispatch through `/msn`
+   (`skills/msn/SKILL.md`). Pick a seat by roster entry, never by matching text in a model id. Every
+   output is checked.
+
+6. **Fleet all out:** re-route to Claude roles, never to main chat itself:
 
 - **scout** = Haiku — finds files/symbols/locations, reports locations, not file dumps.
 - **researcher** = Sonnet — reads docs/sources, reports facts, marks anything unverifiable as unverified.
@@ -39,10 +50,13 @@ Definitions for all five: `agents/scout.md`, `agents/researcher.md`, `agents/ref
 `agents/lean-drafter.md`, `agents/debugger.md`.
 Any role hitting an ambiguous source **escalates, never decides.**
 
+7. **Claude window low:** stop, write a handoff, and resume after the reset.
+
 **Main chat = orchestrator only** — plans, writes briefs, reads short reports, judges, integrates.
 Claude doing the work itself directly is critical-only, and ask first.
 
-One-line fixes and a single grep stay inline in main chat either way.
+Run a script check, then one independent checker. An outside provider never checks its own work; a
+Claude builder's work goes to a separate refuter run.
 
 ## 3. Data rule
 
@@ -67,7 +81,7 @@ output format · output length cap · facts already known (so it doesn't re-disc
 A worker reports back short: verdict plus file paths, not the work itself. Large output goes to a
 scratch file the next agent reads. **Main chat never opens a worker's raw output.**
 
-## 6. When the fleet is alive — the dispatch loop
+## 6. The dispatch loop — a coding CLI or the fleet
 
 Write the brief to a file, run it in the background, read only the seat's result file for the
 verdict, and rework with a delta brief — never re-paste the whole task. The full loop, per seat, is

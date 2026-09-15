@@ -9,7 +9,7 @@ description: >-
   paste-back minds (ChatGPT). The user's own material may go to any of them (a configurable default). Use when the user says
   "convene the board/squad", "run it past the fleet",
   "get MSN on this", invokes /msn, wants several models on a problem, or wants work pushed to the
-  cheapest capable seat to spare Claude's tokens. The fleet is the DEFAULT worker, not the fallback:
+  cheapest capable seat to spare Claude's tokens. A coding CLI through the gateway is the default worker; the fleet covers rung 5, not the main chat:
   a single command may be run inline, but a task with steps goes to a seat.
 license: MIT
 metadata:
@@ -69,36 +69,36 @@ Full roster with the exact invocation and data rule for each seat is
 | **You** | Owner + captain | The deciding vote · commits · installs · sign-ins · uploads | — |
 | *bench* | Unsigned / released | SambaNova · **Cerebras (released 2026-09-05)** | **Not wired** — see [references/candidate-bench.md](references/candidate-bench.md) |
 
-## The ladder — MSN is rungs 1 and 2
+## The ladder — MSN covers rung 5
 
 Your own routing rules (e.g. in your `CLAUDE.md`) are the authority; this is what it
 means for the squad. **Take the lowest rung that can do the job, and say which rung before starting.**
 
-1. **Fleet first.** Anything that can leave Anthropic, leaves — reading, searching, research,
-   drafting, transcribing, formatting, first-draft code. This is MSN's whole reason to exist.
-2. **Cheapest capable seat — and the ladder applies INSIDE the fleet too.** Free lanes
-   (opencode / agy / vibe / grok) before Codex; and on the Codex channel, its routine model before
-   **Astra**. Astra is the deep-lying playmaker, not the default midfielder: ask for it when the
-   reasoning genuinely needs it, never because it is the strongest name on the sheet. ⚠️ **Free
-   does not mean available** — see the measured free-lane state in
-   [references/roster.md](references/roster.md) before assuming four lanes are live.
-3. **Claude subagent — only when no seat can do it.** By default that is mostly **verification**,
-   plus vision work no wired seat can take. `haiku` for read-only search,
-   `sonnet` for drafting and transcription.
-   A helper hitting an ambiguous source **escalates, never decides**.
-4. **The manager reviews and routes; it does not play.** It reads what came back, judges it, names
-   the fix, and sends it back down. Its own hands only on critical items — **and it asks first.**
-5. **Opus doing the work itself — critical only, and ask.** Standing exceptions are named per
-   project — e.g. a security-critical core in one project, an executing subagent in another.
+1. **Inline in main chat:** only a one-liner fix or a single grep.
+2. **Default worker:** a coding CLI through the local gateway, using `auto/coding` or
+   `auto/coding:reliable` for must-be-right work.
+3. **CLI out, gateway alive:** a second coding CLI through the gateway, using the same combo.
+4. **Gateway down, CLI alive:** the coding CLI on its own login — a routine model for routine work,
+   a stronger model for must-be-right work.
+5. **Both out:** MSN covers this rung — the rest of the fleet direct, no gateway. Route to a proven
+   capable fleet seat; every output is checked. ⚠️ **A dead seat means the NEXT seat, not Claude** —
+   a 429, quota wall, 402 or timeout is one seat out, not the fleet out. Try every capable seat and
+   name the failures in the report before dropping to rung 6.
+6. **Fleet all out:** Claude roles — scout (Haiku), researcher (Sonnet), builder (Sonnet), refuter
+   (Opus), debugger (Opus, rare). A helper hitting an ambiguous source escalates, never decides.
+7. **Claude window low:** stop, write a handoff, and resume after the reset.
 
-⚠️ **A dead seat means the NEXT seat, not Claude.** A 429, a quota wall, a 402, a timeout — that is
-one seat out, not the fleet out. Go down the bench and try the next capable seat, and only climb to
-rung 3 when **every** seat has been tried and named. Falling back to Claude on the first refusal is
-the most expensive move available, and it is the one that happens by reflex. Say which seats failed
-and how, in the report — an undocumented fallback looks identical to laziness.
+Probe liveness once with one tiny request per rung before a batch. On a limit or connection error,
+drop one rung; do not retry in a loop, and never trust a quota tool. Main chat orchestrates
+throughout; it is not a rung. **The manager reviews and routes; it does not play** — it judges what
+came back, names the fix and sends it back down. **Opus doing the work itself — critical only, and
+ask.** Standing exceptions are named per project.
 
-**Never leaves Claude:** verification of any seat's output · edits to `CLAUDE.md`, `MEMORY.md`,
-`settings.json` · git. **The user's own material is no longer on this list, by default.**
+Run a script check, then one independent checker. An outside provider never checks its own work; a
+Claude builder's work goes to a separate refuter run.
+
+**Never leaves Claude:** edits to `CLAUDE.md`, `MEMORY.md`, `settings.json` · git. **The user's own
+material is no longer on this list, by default.**
 
 ## The playmaker — route before you convene
 

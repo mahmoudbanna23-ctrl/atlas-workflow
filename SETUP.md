@@ -213,6 +213,10 @@ Three things learned the hard way:
   question about words with a bare floating-point number.
 - ⚠️ **A combo's name is not a measurement.** `auto/best-coding` is a claim by the gateway, not a
   result. Measure before you rely on one — see Part 5.
+- ⛔ **Never route to an `auto/*` combo.** It fans one request across its whole candidate pool, and
+  free-tier caps hold a single call, not that — measured 0 of 221 successful requests over a week.
+  The ladder here never lands on one; build a named, priority-failover combo from seats you measured
+  instead (Part 5).
 
 For comparison, on the surveyed machine the *routed combos* answered 12 of 12 test items correctly
 while individually named seats scored between 22% and 64%. That gap is the argument for the gateway.

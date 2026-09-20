@@ -69,30 +69,34 @@ Full roster with the exact invocation and data rule for each seat is
 | **You** | Owner + captain | The deciding vote · commits · installs · sign-ins · uploads | — |
 | *bench* | Unsigned / released | SambaNova · **Cerebras (released 2026-09-05)** | **Not wired** — see [references/candidate-bench.md](references/candidate-bench.md) |
 
-## The ladder — MSN covers rung 5
+## The ladder — MSN covers rungs 2 and 3
 
 Your own routing rules (e.g. in your `CLAUDE.md`) are the authority; this is what it
 means for the squad. **Take the lowest rung that can do the job, and say which rung before starting.**
 
-1. **Inline in main chat:** only a one-liner fix or a single grep.
-2. **Default worker:** a coding CLI through the local gateway, using `auto/coding` or
-   `auto/coding:reliable` for must-be-right work.
-3. **CLI out, gateway alive:** a second coding CLI through the gateway, using the same combo.
-4. **Gateway down, CLI alive:** the coding CLI on its own login — a routine model for routine work,
-   a stronger model for must-be-right work.
-5. **Both out:** MSN covers this rung — the rest of the fleet direct, no gateway. Route to a proven
-   capable fleet seat; every output is checked. ⚠️ **A dead seat means the NEXT seat, not Claude** —
-   a 429, quota wall, 402 or timeout is one seat out, not the fleet out. Try every capable seat and
-   name the failures in the report before dropping to rung 6.
-6. **Fleet all out:** Claude roles — scout (Haiku), researcher (Sonnet), builder (Sonnet), refuter
+1. **Inline in main chat:** a one-liner fix or a single grep, nothing with steps.
+2. **Bulk per-item work:** MSN covers this rung for scripted dispatch — a script making single-shot
+   gateway calls, one POST per item to a named priority-failover combo you built from seats you
+   measured (e.g. `work-text` / `work-vision`). Free seats hold single calls, never an agentic loop.
+   Never `auto/*` — measured 0 of 221 successful requests over a week; free-tier caps hold single
+   calls, not 30–60-turn agent loops.
+3. **A job with steps:** MSN also covers this rung — ONE agentic attempt, under a wall clock, on a
+   seat your capability file marks capable: a coding CLI through the gateway
+   (`tools/omniroute/codex-gw.sh`, set `CODEX_GW_MODEL`, no default), a coding CLI on its own login,
+   or one proven capable fleet seat direct for one bounded draft or check. Every output is checked.
+   ⚠️ **A dead seat means the NEXT seat, not Claude** — a 429, quota wall, 402 or timeout is one seat
+   out, not the fleet out. Try every capable seat and name the failures in the report before dropping
+   to rung 4.
+4. **Fleet all out:** Claude roles — scout (Haiku), researcher (Sonnet), builder (Sonnet), refuter
    (Opus), debugger (Opus, rare). A helper hitting an ambiguous source escalates, never decides.
-7. **Claude window low:** stop, write a handoff, and resume after the reset.
+5. **Claude window low:** stop, write a handoff, and resume after the reset.
 
-Probe liveness once with one tiny request per rung before a batch. On a limit or connection error,
-drop one rung; do not retry in a loop, and never trust a quota tool. Main chat orchestrates
-throughout; it is not a rung. **The manager reviews and routes; it does not play** — it judges what
-came back, names the fix and sends it back down. **Opus doing the work itself — critical only, and
-ask.** Standing exceptions are named per project.
+Capability, not liveness: once per session run one tiny real task per seat (a tool call, a number
+read off an image) and write the results to a capability file (e.g. `seats-alive.json`). A pong
+proves nothing. Two failed dispatches on a job → a Claude role, never a third try; never a retry
+loop. Main chat orchestrates throughout; it is not a rung. **The manager reviews and routes; it does
+not play** — it judges what came back, names the fix and sends it back down. **Opus doing the work
+itself — critical only, and ask.** Standing exceptions are named per project.
 
 Run a script check, then one independent checker. An outside provider never checks its own work; a
 Claude builder's work goes to a separate refuter run.

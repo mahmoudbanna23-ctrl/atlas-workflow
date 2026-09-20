@@ -13,7 +13,7 @@ This repository holds the whole thing, so you can run it on your own fleet:
 |---|---|
 | `skills/atlas/` | **The workflow.** Five stages: Frame → Route → Do → Gate → Deliver. Install as a Claude Code skill, invoke with `/atlas`. |
 | `skills/msn/` | **The squad.** How a task gets handed to a specific model seat, briefed, and checked when it comes back. `/msn`. |
-| `skills/fleet/` | **The drift alarm.** Fires when the main chat starts doing the work itself; re-routes down the ladder — coding CLI through a gateway first, then the fleet, then the Claude roles below when all are out. `/fleet`. |
+| `skills/fleet/` | **The drift alarm.** Fires when the main chat starts doing the work itself; re-routes down the ladder — scripted bulk calls first, then one bounded agentic attempt on a measured seat, then the Claude roles below when both are out. `/fleet`. |
 | `agents/` | **The Claude-side roles.** Five narrow subagent definitions — scout, researcher, builder (`lean-drafter`), refuter, debugger — for when work has to stay inside Claude. |
 | `tools/omniroute/` | **The gateway probes.** Small node scripts that ask a local OmniRoute install what it can actually do, instead of trusting its dashboard. Plus `codex-gw.sh`, which runs `codex exec` through the gateway with tool calls working. |
 | `tools/guard/drift-guard.js` | **The step-budget hook.** A PostToolUse hook that reminds you every 10 tool calls to re-check register and routing, and flags a ~80-step main-chat session for a fresh start. |
@@ -27,26 +27,29 @@ This repository holds the whole thing, so you can run it on your own fleet:
 ## The idea in one page
 
 **1. The default worker is not the main chat — it is an orchestrator, not labour.** There is a
-ladder, and you take the lowest rung that can do the job:
+ladder, and you take the lowest rung that can do the job, named before starting:
 
-1. **Inline in main chat** — only a one-liner fix or a single grep. Anything with steps goes down.
-2. **Default worker — a coding CLI through the local gateway** (`skills/fleet/`, `skills/msn/`): use
-   `auto/coding`, or `auto/coding:reliable` for must-be-right work; brief file, background run,
-   short report back. Codex goes through `tools/omniroute/codex-gw.sh`, which makes tool calls work.
-3. **That CLI out, gateway alive** — a second coding CLI through the gateway, using the same combo.
-4. **Gateway down, a CLI still alive** — the coding CLI on its own login: a routine model for
-   routine work, a stronger model for must-be-right work.
-5. **Both out** — the rest of the fleet direct, with no gateway. Every output is checked.
-6. **Fleet all out — Claude roles** (`agents/`) — scout (Haiku), researcher (Sonnet), builder
-   (Sonnet), refuter (Opus), debugger (Opus, rare). A role hitting an ambiguous source escalates,
-   never decides.
-7. **Claude window low** — stop, write a handoff, and resume after the reset.
+1. **Inline in main chat** — a one-liner fix or a single grep, nothing with steps.
+2. **Bulk per-item work** → a script making single-shot gateway calls, one POST per item to a named
+   priority-failover combo you built from seats you measured (e.g. `work-text` / `work-vision`).
+   Free seats hold single calls, never an agentic loop. Never `auto/*`.
+3. **A job with steps** → ONE agentic attempt, under a wall clock, on a seat your capability file
+   marks capable — a coding CLI through the gateway (`tools/omniroute/codex-gw.sh`, set
+   `CODEX_GW_MODEL`, no default), a coding CLI on its own login, or a free CLI lane for one bounded
+   draft or check. Every output checked.
+4. **Claude roles** (`agents/`) — scout (Haiku), researcher (Sonnet), builder (Sonnet, `lean-drafter`),
+   refuter (Opus), debugger (Opus, rare). A role hitting an ambiguous source escalates, never decides.
+5. **Claude window low** — stop, write a handoff, and resume after the reset.
+
+Measured over a week: auto combos 0 of 221 successful requests; free-tier caps hold single calls,
+not 30–60-turn agent loops.
 
 **Main chat orchestrates throughout** — plans, writes briefs, spins up agents, reads short reports,
 judges, integrates. It never bulk-reads and never opens a worker's raw output directly.
 
-Probe liveness once with one tiny request per rung before a batch. On a limit or connection error,
-drop one rung; do not retry in a loop, and never trust a quota tool.
+Capability, not liveness: once per session run one tiny real task per seat (a tool call, a number
+read off an image) and write the results to a capability file (e.g. `seats-alive.json`). A pong
+proves nothing. Two failed dispatches on a job → a Claude role, never a third try; never a retry loop.
 
 Run a script check, then one independent checker. An outside provider never checks its own work; a
 Claude builder's work goes to a separate refuter run.

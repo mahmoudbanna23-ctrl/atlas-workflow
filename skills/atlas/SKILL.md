@@ -49,11 +49,11 @@ light and escalate if Frame turns up something genuinely unknown.
   context on every remaining step. One bounded job, then return. **Session budget ~80 main-chat
   steps**, then write a handoff and start a fresh session — `tools/guard/drift-guard.js` reminds you
   at the threshold once wired as a PostToolUse hook (`SETUP.md`).
-- **The default worker is a coding agent CLI through a gateway** (updated ruling) — it now sits
-  first on the lane ladder (Stage 2 §1), ahead of the fleet and Claude roles: a gateway combo first,
-  a second CLI through the same gateway if it alone is out, the CLI's own vendor login if the
-  gateway is down. Stage 4's independent check is still never that same CLI reviewing its own
-  draft — see the self-review rule there.
+- **The default worker is not the main chat.** Take the lowest rung that can do the job (Stage 2
+  §1): a script for bulk per-item calls to a measured seat, then one bounded agentic attempt on a
+  measured seat (a gateway combo, a CLI on its own login, or a free lane), then Claude roles.
+  Stage 4's independent check is still never that same CLI reviewing its own draft — see the
+  self-review rule there.
 
 ---
 
@@ -148,17 +148,15 @@ a consumer web UI through your own browser cookies** — an account ban is the o
 **Nothing below this stage decides whether it is needed.** Route names the machinery, out loud,
 before any of it starts. Four decisions:
 
-**1. Which lane does the work?** Take the lowest that can do the job (your workspace rules), in
-this order:
+**1. Which lane does the work?** Take the lowest that can do the job (your workspace rules), named
+before starting, in this order:
 
 | Lane | Use it for | Warning |
 |---|---|---|
 | **Inline main chat** | One-liner fixes or a single grep only | Anything with steps goes down. |
-| **Coding CLI through the local gateway** (default worker) | Real drafting/build work | Use `auto/coding`, or `auto/coding:reliable` for must-be-right work. Codex runs through `tools/omniroute/codex-gw.sh`. |
-| **Second coding CLI through the gateway** | The default CLI is out but the gateway is alive | Use the same combo. |
-| **Coding CLI on its own login** | The gateway is down but a CLI is alive | A routine model for routine work; a stronger model for must-be-right work. |
-| **Fleet** (MSN) | Both CLI routes are out | Rest of the fleet direct, no gateway; every output is checked. |
-| **Claude roles** | Fleet all out | Scout (Haiku), researcher (Sonnet), builder (Sonnet), refuter (Opus), debugger (Opus, rare). |
+| **Script — bulk per-item calls** | Many small items, same shape | One POST per item to a named priority-failover combo built from measured seats (e.g. `work-text` / `work-vision`). Free seats hold single calls, never an agentic loop. Never `auto/*` — measured 0 of 221 successful requests over a week. |
+| **One agentic attempt, under a wall clock** | A job with steps, on a seat your capability file marks capable | A coding CLI through the gateway (`tools/omniroute/codex-gw.sh`, set `CODEX_GW_MODEL`, no default), a coding CLI on its own login, or a free CLI lane for one bounded draft or check. Every output checked. |
+| **Claude roles** | The above are out or the job needs to stay inside Claude | Scout (Haiku), researcher (Sonnet), builder (Sonnet), refuter (Opus), debugger (Opus, rare). |
 | **Claude window low** | The Claude window is low | Stop, write a handoff, and resume after the reset. |
 
 ⚠️ **Bulk per-item work goes in a script, never an agent loop** — a script sends one item and forgets it; an agent re-sends every previous item on every step.
@@ -168,15 +166,15 @@ user before initializing spec-kit anywhere new** — it re-feeds artifacts and b
 the implement phase. Seed it in one project first, not everywhere; spec-kit plans, the default
 worker implements.
 
-**1a. In the gateway coding-CLI rungs, hand the seat choice to the gateway rather than naming a seat.** This is
-the layer that makes OmniRoute part of Route and not only of Do. The built-in combos — `auto`,
-`auto/coding`, `auto/reasoning`, `auto/vision`, `auto/coding:reliable` — are **model ids**, each an
-eight-seat pool with strategy `fallback`, so a seat that fails is retried **inside the gateway**
-instead of handing the job back as another step here. Measured 2026-09-08: 12 of 12 correct, against
-named-seat rates of 22–64%. Route names a specific seat only when the job needs that seat's one
-capability — Gemini or `auto/vision` for a scanned page, nothing else reads one. ⛔ **Never a `:free`
-variant** — `auto/coding:free` answered a word question with a bare float. ⚠️ **Leave a big
-`max_tokens`**: these ids spend the cap on hidden reasoning and return 200 with an empty string.
+**1a. Build a named, priority-failover combo from seats you measured — never hand the choice to a
+built-in `auto/*` pool.** The gateway ships auto combos (`auto`, `auto/coding`, `auto/reasoning`,
+`auto/vision`, and `:free`/`:reliable` variants), but measured over a week they returned 0 of 221
+successful requests: they fan one request across every candidate seat, and free-tier caps hold a
+single call, not that kind of load. Build your own combo instead, ordered by seats you actually
+tested (e.g. `work-text` / `work-vision`), and route a job with steps to it under rung 3, one agentic
+attempt at a time. ⛔ **Never a `:free` variant** on any combo, named or built-in — one answered a
+word question with a bare float. ⚠️ **Leave a big `max_tokens`**: these ids spend the cap on hidden
+reasoning and return 200 with an empty string.
 
 Route on measured numbers, not on reported ones. `omniroute_get_provider_metrics` and the per-seat
 table inside `omniroute_cost_report` are real (the report's own totals are 0, and it costs ~9k tokens
@@ -184,8 +182,9 @@ to fetch — pull it when the per-seat numbers are the decision, never to check 
 **`omniroute_check_quota` LIES** — 100% and "valid" for every connection including the ones that are
 out of credit. Never route off it.
 
-Probe liveness once with one tiny request per rung before a batch. On a limit or connection error,
-drop one rung; do not retry in a loop, and never trust a quota tool.
+Capability, not liveness: once per session run one tiny real task per seat (a tool call, a number
+read off an image) and write the results to a capability file (e.g. `seats-alive.json`). A pong
+proves nothing. Two failed dispatches on a job → a Claude role, never a third try; never a retry loop.
 
 **1b. The last resort — only after the gateway is down and every later rung is gone** (standing
 ruling). If the gateway is down, the fleet is dead, and the coding CLI's own vendor login (§1, rung

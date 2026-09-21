@@ -100,14 +100,31 @@ a consumer web UI through your own browser cookies** — an account ban is the o
     description: **a result is a lead to verify, never an index to trust.** ⚠️ **Always `_scan`
     before reading a repo further** (hardcoded secrets, `eval(base64)`, `os.system`-style calls), and
     **never `_install`.**
-- **Research** (1–2 Sonnet agents, honest verdicts) — only for a genuinely new project, and only in
-  the tracks that apply: **Execution** (existing tools/repos worth adopting; most are redundant or
-  token-negative, say so), **Functions** (how the best comparable things work — a ranked steal
-  this / skip this list), **Design** (3–5 concrete referenced directions, never "make it modern"),
-  and a **free-AI sweep** for the weak spots (verify a free tier is real, not a trial). The commander
-  picks the sources per domain before dispatching. **Grounding is absolute:** every verdict cites
-  what was actually read, findings land in the plan file with links so research is never repeated,
-  and anything unconfirmable is marked unconfirmed.
+- **Research** (honest verdicts) — only for a genuinely new project, sized to it. **Research the
+  whole craft, not the topic.** A request names a thing ("a textbook", "a booking app"); the
+  finished thing is a stack of decisions a professional in that field makes on purpose, and every
+  one of them gets researched. Any examples the user gives are illustrations, never the checklist.
+  1. **Decompose before searching.** List every facet a finished one of these consists of, as a
+     practitioner would see it: content and its authoritative sources · structure · voice and
+     writing style · visual identity (cover, layout, colour, imagery) · typography (faces, sizes,
+     measure, hierarchy) · production format and its limits (print size, file type, platform) ·
+     what the audience expects and what the field's best-regarded examples do · functions worth
+     stealing · tools and free-AI lanes (existing tools/repos worth adopting — most are redundant
+     or token-negative, say so; verify a free tier is real, not a trial). Add the facets this
+     domain has that the list lacks, drop the ones it does not have. Show the user the facet list
+     before spending on it — a missing facet is cheapest to catch here.
+  2. **Exemplars per facet.** 3–5 real best-in-class examples each — the ones practitioners
+     actually rate, not the first search hit — with why each is good. Never "make it modern".
+  3. **Specs, not impressions.** Each facet ends in something a builder can follow without asking:
+     named fonts with sizes and a checked licence, a page grid, a colour set, a sentence-level
+     style sheet with one sample paragraph, a ranked source list, a steal this / skip this list.
+     "Clean and professional" is not a finding.
+  4. **One spec sheet** in the plan file: facet → decision → the exemplars it came from → links, so
+     research is never repeated. **Grounding is absolute:** every verdict cites what was actually
+     read, and anything unconfirmable is marked unconfirmed. The user confirms the taste facets
+     (voice, cover, fonts) before any building starts.
+  Routing: one facet = one bounded job on the routing ladder, run side by side; the commander
+  picks the sources per domain before dispatching and reads the spec sheet only.
 - **Burn audit** — rank the planned tasks by expected token cost and flag the heavy ones (bulk
   reading, image work, repetitive generation, long sessions). For each, find an offload route in
   strict price order, stopping at the first that survives: free and already installed → free
